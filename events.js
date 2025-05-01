@@ -9,6 +9,7 @@ import * as Theme from './theme.js';
 import * as Modal from './modal.js';
 import * as ImportExport from './importExport.js';
 import { extractColorsFromImage } from './colorExtractor.js'; // Import from colorExtractor
+import * as Playlist from './playlist.js'; // Import Playlist module
 
 export function setupEventListeners() {
     // Audio player controls
@@ -121,8 +122,8 @@ function openLyricsEditor() {
 function handleOpenColorEditor() {
     // Populate inputs with current theme colors before opening
     Theme.populateColorInputs();
-    // Populate the extracted palette display
-    Theme.updateExtractedPaletteDisplay();
+    // Populate the extracted palette display using the exported UI function
+    UI.updateExtractedPaletteDisplay(); 
     // Reset rotation offset when modal opens
     Theme.resetThemeRotationOffset(); 
     Modal.openModal(elements.colorEditModal);

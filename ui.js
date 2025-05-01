@@ -9,7 +9,7 @@ import * as Playlist from './playlist.js'; // Needed for loading songs from pane
 import * as Modal from './modal.js'; // Needed for editing playlists
 
 // Export functions that might be called directly from other modules
-export { updateHistoryPanel, updatePlaylistsPanel, updateCurrentPlaylistPanel, updateUI, updateProgressUI, updatePlayerControls };
+export { updateHistoryPanel, updatePlaylistsPanel, updateCurrentPlaylistPanel, updateUI, updateProgressUI, updatePlayerControls, updateExtractedPaletteDisplay };
 
 function updateUI() {
     updateSongInfo();
@@ -23,6 +23,7 @@ function updateUI() {
     updatePlayerControls(); // Reflect play/pause state, volume etc.
     updateProgressUI(); // Add this line to ensure progress bar is updated initially
     Audio.updateTimeDisplay(); // Update time display
+    updateExtractedPaletteDisplay(); // Update palette display on general UI updates too
 }
 
 function updateSongInfo() {
@@ -340,5 +341,52 @@ function updateProgressUI() {
         elements.progress.style.width = `${percentage}%`;
     } else {
         elements.progress.style.width = '0%'; // Reset if no duration or time
+    }
+}
+
+/**
+ * Updates the display of extracted color swatches in the color edit modal.
+ */
+function updateExtractedPaletteDisplay() {
+    const palette = state.currentSong.extractedPalette || [];
+    const displayElement = elements.extractedPaletteDisplay;
+    const noteElement = displayElement.querySelector('.note');
+
+    // Clear previous swatches
+    displayElement.querySelectorAll('.extracted-palette-swatch').forEach(swatch => swatch.remove());
+
+    if (palette.length > 0) {
+        // Hide the 'no colors' note
+        if (noteElement) noteElement.style.display = 'none';
+
+        // Create and append swatches
+        palette.forEach(colorHex => {
+            const swatch = document.createElement('div');
+            swatch.className = 'extracted-palette-swatch';
+            swatch.style.backgroundColor = colorHex;
+            swatch.title = `Extracted color: ${colorHex}`;
+            // Optionally add click handler to copy color
+            swatch.addEventListener('click', () => {
+                navigator.clipboard.writeText(colorHex).then(() => {
+                    // Optional feedback: Maybe flash the swatch or show a tooltip
+                    console.log(`Copied ${colorHex} to clipboard.`);
+                }).catch(err => {
+                    console.error('Failed to copy color:', err);
+                });
+            });
+            displayElement.appendChild(swatch);
+        });
+    } else {
+        // Show the 'no colors' note
+        if (noteElement) {
+            noteElement.style.display = 'block';
+             noteElement.textContent = 'No colors extracted from image yet.';
+        } else {
+            // Create the note if it doesn't exist (shouldn't happen with current HTML)
+            const p = document.createElement('p');
+            p.className = 'note';
+            p.textContent = 'No colors extracted from image yet.';
+            displayElement.appendChild(p);
+        }
     }
 }
