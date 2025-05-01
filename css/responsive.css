@@ -61,6 +61,14 @@
     .upload-section {
         justify-content: space-around; /* Space out upload buttons */
         flex-wrap: wrap; /* Allow buttons to wrap */
+        align-items: center; /* Center items when stacking */
+    }
+
+    /* Target the button group specifically for wrapping */
+    .upload-buttons {
+        flex-wrap: wrap;
+        justify-content: center; /* Center buttons when they wrap */
+        gap: var(--spacing-xs); /* Reduce gap when wrapped */
     }
 
     .upload-btn {
