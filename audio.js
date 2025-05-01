@@ -145,7 +145,5 @@ export function handleAudioUpload(e) {
     }
 
     Storage.saveCurrentSongState(); // Save potentially updated title/artist and audioUrl
-    UI.updateSongInfo(); // Update title/artist fields
-    UI.updateProgressUI(); // Reset progress bar visually
-    updateTimeDisplay(); // Reset time display
+    UI.updateUI(); // Update the entire UI, which includes song info fields
 }
