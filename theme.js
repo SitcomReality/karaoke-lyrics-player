@@ -25,7 +25,7 @@ export function updateThemeUI() {
     elements.secondaryColor.style.backgroundColor = state.currentSong.theme.secondary;
     elements.accentColor.style.backgroundColor = state.currentSong.theme.accent;
     elements.backgroundColor.style.backgroundColor = state.currentSong.theme.background;
-    elements.textColor.style.backgroundColor = state.currentSong.theme.text;
+    elements.textColor.style.backgroundColor = state.currentSong.theme.text; // This preview shows the "--on-background" color
 
     // Apply theme colors to CSS variables
     applyTheme(state.currentSong.theme);
@@ -46,7 +46,7 @@ export function updateThemeUI() {
  */
 function hexToRgbString(hex) {
     const rgb = ColorUtils.hexToRgb(hex);
-    if (!rgb) return '255, 255, 255'; // Default to white if conversion fails
+    if (!rgb) return '255, 255, 255'; // Default to white components if conversion fails
     return `${rgb.r}, ${rgb.g}, ${rgb.b}`;
 }
 
@@ -60,27 +60,47 @@ export function applyTheme(theme) {
     elements.root.style.setProperty('--accent-color', theme.accent);
     elements.root.style.setProperty('--background-color', theme.background);
     elements.root.style.setProperty('--on-background', theme.text);
+    elements.root.style.setProperty('--on-surface', theme.text); // Use same text color for surface by default
 
     // Derive surface color from background
     const currentBgRgb = ColorUtils.hexToRgb(theme.background);
-    let surfaceColor;
+    let surfaceColorHex;
     if (currentBgRgb) {
         const brightness = ColorUtils.calculateBrightness(currentBgRgb);
         // Adjust brightness slightly based on how dark the background is
-        const adjustment = brightness < 50 ? 10 : (brightness < 100 ? 7 : 5);
-        surfaceColor = ColorUtils.adjustBrightness(theme.background, adjustment);
+        // Increase brightness slightly for dark backgrounds, decrease for light ones
+        const adjustment = brightness < 128 ? 5 : -3;
+        surfaceColorHex = ColorUtils.adjustBrightness(theme.background, adjustment);
     } else {
-        surfaceColor = ColorUtils.lightenColor(theme.background, 5); // Fallback adjustment
+        surfaceColorHex = ColorUtils.adjustBrightness(theme.background, 5); // Fallback adjustment
     }
-    elements.root.style.setProperty('--surface-color', surfaceColor);
+    elements.root.style.setProperty('--surface-color', surfaceColorHex);
 
-    // Set text contrast colors based on background colors
-    // Use a helper function for better readability
-    elements.root.style.setProperty('--on-primary', ColorUtils.getContrastColor(theme.primary));
-    elements.root.style.setProperty('--on-secondary', ColorUtils.getContrastColor(theme.secondary));
-    // Don't usually need contrast for accent, but can add if needed:
-    // elements.root.style.setProperty('--on-accent', ColorUtils.getContrastColor(theme.accent));
-    elements.root.style.setProperty('--on-error', ColorUtils.getContrastColor('#cf6679')); // Assuming error color is fixed
+    // Set contrast colors based on the main colors
+    const onPrimary = ColorUtils.getContrastColor(theme.primary);
+    const onSecondary = ColorUtils.getContrastColor(theme.secondary);
+    // For surface, derive contrast from the *calculated* surface color
+    const onSurface = ColorUtils.getContrastColor(surfaceColorHex);
+    const onError = ColorUtils.getContrastColor(elements.root.style.getPropertyValue('--error-color') || '#cf6679'); // Use existing or default error color
+
+    elements.root.style.setProperty('--on-primary', onPrimary);
+    elements.root.style.setProperty('--on-secondary', onSecondary);
+    elements.root.style.setProperty('--on-surface', onSurface); // Override default text color if needed for surface contrast
+    elements.root.style.setProperty('--on-error', onError);
+
+    // Set RGB versions of all colors for rgba() usage
+    elements.root.style.setProperty('--rgb-primary', hexToRgbString(theme.primary));
+    elements.root.style.setProperty('--rgb-secondary', hexToRgbString(theme.secondary));
+    elements.root.style.setProperty('--rgb-accent', hexToRgbString(theme.accent));
+    elements.root.style.setProperty('--rgb-background', hexToRgbString(theme.background));
+    elements.root.style.setProperty('--rgb-surface', hexToRgbString(surfaceColorHex));
+    elements.root.style.setProperty('--rgb-error', hexToRgbString(elements.root.style.getPropertyValue('--error-color') || '#cf6679'));
+
+    elements.root.style.setProperty('--rgb-on-primary', hexToRgbString(onPrimary));
+    elements.root.style.setProperty('--rgb-on-secondary', hexToRgbString(onSecondary));
+    elements.root.style.setProperty('--rgb-on-background', hexToRgbString(theme.text));
+    elements.root.style.setProperty('--rgb-on-surface', hexToRgbString(onSurface));
+    elements.root.style.setProperty('--rgb-on-error', hexToRgbString(onError));
 }
 
 /**

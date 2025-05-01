@@ -4,33 +4,42 @@
     --secondary-color: #3700b3;
     --accent-color: #03dac6;
     --background-color: #121212;
-    --surface-color: #1e1e1e;
+    --surface-color: #1e1e1e; /* Typically slightly lighter/different than background */
     --error-color: #cf6679;
     --on-primary: #ffffff;
     --on-secondary: #ffffff;
-    --on-background: #e1e1e1;
-    --on-surface: #e1e1e1;
+    --on-background: #e1e1e1; /* Text on main background */
+    --on-surface: #e1e1e1;    /* Text on cards, sidebars, etc. */
     --on-error: #000000;
 
     /* RGB versions for alpha transparency */
-    --rgb-on-background: 225, 225, 225; /* Default: e1e1e1 */
-    --rgb-on-surface: 225, 225, 225;    /* Default: e1e1e1 */
-    --rgb-primary: 98, 0, 234;         /* Default: 6200ea */
-    --rgb-accent: 3, 218, 198;          /* Default: 03dac6 */
+    --rgb-primary: 98, 0, 234;
+    --rgb-secondary: 55, 0, 179; /* Added secondary rgb */
+    --rgb-accent: 3, 218, 198;
+    --rgb-background: 18, 18, 18; /* Added background rgb */
+    --rgb-surface: 30, 30, 30; /* Added surface rgb */
+    --rgb-error: 207, 102, 121; /* Added error rgb */
+    --rgb-on-primary: 255, 255, 255;
+    --rgb-on-secondary: 255, 255, 255;
+    --rgb-on-background: 225, 225, 225;
+    --rgb-on-surface: 225, 225, 225;
+    --rgb-on-error: 0, 0, 0;
+
 
     /* Font settings */
-    --font-family: 'Roboto', sans-serif;
+    --default-font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    --font-family: 'Roboto', var(--default-font-stack);
     --font-size-small: 0.875rem;
     --font-size-normal: 1rem;
     --font-size-large: 1.125rem;
     --font-size-xlarge: 1.375rem;
 
     /* Spacing */
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
+    --spacing-xs: 0.25rem; /* 4px */
+    --spacing-sm: 0.5rem;  /* 8px */
+    --spacing-md: 1rem;    /* 16px */
+    --spacing-lg: 1.5rem;  /* 24px */
+    --spacing-xl: 2rem;    /* 32px */
 
     /* Shadows */
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
