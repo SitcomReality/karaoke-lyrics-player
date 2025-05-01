@@ -8,6 +8,7 @@ import * as Storage from './storage.js';
 import * as Theme from './theme.js';
 import * as Modal from './modal.js';
 import * as ImportExport from './importExport.js';
+import { extractColorsFromImage } from './colorExtractor.js'; // Import from colorExtractor
 
 export function setupEventListeners() {
     // Audio player controls
@@ -37,17 +38,21 @@ export function setupEventListeners() {
 
     // Modal buttons
     elements.importExportBtn.addEventListener('click', () => Modal.openModal(elements.importExportModal));
-    elements.editColorsBtn.addEventListener('click', handleOpenColorEditor); 
+    elements.editColorsBtn.addEventListener('click', handleOpenColorEditor);
     elements.createPlaylistBtn.addEventListener('click', () => Modal.openModal(elements.createPlaylistModal));
 
     // Theme/Color editing modal handlers
     elements.applyColorsBtn.addEventListener('click', handleApplyColors);
-    elements.extractColorsBtn.addEventListener('click', () => Theme.extractColorsFromImage(elements.songImage));
-    elements.applyExtractedThemeBtn.addEventListener('click', Theme.applyExtractedTheme); 
+    elements.extractColorsBtn.addEventListener('click', () => extractColorsFromImage(elements.songImage)); // Use imported function
+    elements.applyExtractedThemeBtn.addEventListener('click', Theme.applyExtractedTheme);
 
     // Font selection
     elements.fontSelector.addEventListener('change', handleFontChange);
     elements.applyFontBtn.addEventListener('click', handleApplyCustomFont);
+
+    // Playlist controls
+    elements.prevSongBtn.addEventListener('click', () => Playlist.playPreviousSong()); // Added event listener
+    elements.nextSongBtn.addEventListener('click', () => Playlist.playNextSong()); // Added event listener
 
     // Modal content handlers can be added here...
 
@@ -73,16 +78,27 @@ function handleImageUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
 
+    // Revoke previous object URL if one exists
+    if (state.currentSong.image && state.currentSong.image.startsWith('blob:')) {
+        URL.revokeObjectURL(state.currentSong.image);
+    }
+
     // Create object URL for the image
     const imageUrl = URL.createObjectURL(file);
     state.currentSong.image = imageUrl;
     elements.songImage.src = imageUrl;
 
-    // Optionally extract colors from image
-    Theme.extractColorsFromImage(elements.songImage);
+    // Reset theme rotation offset when a new image is loaded
+    Theme.resetThemeRotationOffset();
 
-    // Save state
+    // Extract colors from the new image
+    extractColorsFromImage(elements.songImage); // Use imported function
+
+    // Save state (including the new image URL)
     Storage.saveCurrentSongState();
+
+    // Reset file input value so the same file can be uploaded again if needed
+    e.target.value = '';
 }
 
 function handleSongInfoChange() {
