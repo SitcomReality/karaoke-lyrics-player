@@ -17,6 +17,7 @@ export function updateUI() {
     updatePlaylistsPanel();
     updateCurrentPlaylistPanel();
     updatePlayerControls(); // Reflect play/pause state, volume etc.
+    updateProgressUI(); // Add this line to ensure progress bar is updated initially
     Audio.updateTimeDisplay(); // Update time display
 }
 
@@ -172,54 +173,66 @@ function updatePlaylistsPanel() {
 }
 
 function updateCurrentPlaylistPanel() {
-    if (!state.currentPlaylist) {
+    const currentPlaylist = getCurrentPlaylist(); // Use getter function
+    if (!currentPlaylist) {
         elements.currentPlaylistPanel.innerHTML = '<p class="empty-message">No active playlist</p>';
         return;
     }
-    
+
     elements.currentPlaylistPanel.innerHTML = `
-        <h4>${state.currentPlaylist.name}</h4>
+        <h4>${currentPlaylist.name}</h4>
         <div class="playlist-songs"></div>
     `;
-    
+
     const songsContainer = elements.currentPlaylistPanel.querySelector('.playlist-songs');
-    
-    state.currentPlaylist.songs.forEach((songId, index) => {
-        // Find the song in history
-        const song = state.history.find(item => `${item.title}_${item.artist}` === songId);
-        
+    const history = getHistory(); // Use getter function
+
+    currentPlaylist.songs.forEach((songId, index) => {
+        // Find the song in history using its ID
+        const song = history.find(item => item.id === songId);
+
         if (!song) {
-            console.warn('Song not found in history:', songId);
+            console.warn('Song ID not found in history:', songId);
+            // Create a placeholder item or skip
+             const item = document.createElement('div');
+             item.className = 'playlist-item missing-song';
+             item.innerHTML = `
+                 <div class="item-info">
+                     <div class="item-title">Missing Song (ID: ${songId})</div>
+                     <div class="item-subtitle">Could not find in history.</div>
+                 </div>
+             `;
+            songsContainer.appendChild(item);
             return;
         }
-        
+
         const item = document.createElement('div');
         item.className = 'playlist-item';
-        
+
         // Check if this is the current song
         if (index === state.currentPlaylistIndex) {
             item.classList.add('active');
         }
-        
-        // Determine if the song has complete data
-        const hasComplete = song.timing && song.timing.some(time => time !== null);
-        const statusClass = hasComplete ? 'status-complete' : 'status-incomplete';
-        const statusText = hasComplete ? 'Complete' : 'Incomplete';
-        
+
+        // Determine if the song has complete data (e.g., timing exists)
+        const hasTiming = song.timing && song.timing.some(time => time !== null && time !== undefined);
+        const statusClass = hasTiming ? 'status-complete' : 'status-incomplete';
+        const statusText = hasTiming ? 'Timed' : 'Untimed';
+
         item.innerHTML = `
             <div class="item-info">
-                <div class="item-title">${song.title}</div>
+                <div class="item-title">${song.title || 'Untitled Song'}</div>
                 <div class="item-subtitle">${song.artist || 'Unknown Artist'}
                     <span class="item-status ${statusClass}">${statusText}</span>
                 </div>
             </div>
         `;
-        
+
         // Add click handler to load the song
         item.addEventListener('click', () => {
             Playlist.loadSongFromPlaylist(index);
         });
-        
+
         songsContainer.appendChild(item);
     });
 }
@@ -231,7 +244,21 @@ function updatePlayerControls() {
     } else {
         elements.playBtn.innerHTML = '<i class="fas fa-play"></i>';
     }
-    
-    // Volume
-    elements.volumeSlider.value = state.audio.volume;
+
+    // Volume - Check if state.audio exists before accessing volume
+    if (state.audio) {
+        elements.volumeSlider.value = state.audio.volume;
+    } else {
+        // If no audio object, set slider to default (e.g., 1 or stored preference)
+        elements.volumeSlider.value = 1; // Default to max volume visually
+    }
+}
+
+export function updateProgressUI() {
+    if (state.duration > 0 && state.currentTime >= 0) {
+        const percentage = (state.currentTime / state.duration) * 100;
+        elements.progress.style.width = `${percentage}%`;
+    } else {
+        elements.progress.style.width = '0%'; // Reset if no duration or time
+    }
 }
