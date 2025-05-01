@@ -29,7 +29,14 @@ export function applyTheme(theme) {
     elements.root.style.setProperty('--background-color', theme.background);
     elements.root.style.setProperty('--on-background', theme.text);
     // Add surface color derived from background (e.g., slightly lighter)
-    const surface = adjustBrightness(theme.background, 5);
+    // Basic check to prevent making already very dark colors even darker
+    const currentBg = hexToRgb(theme.background);
+    let surface;
+    if (currentBg && calculateBrightness(currentBg) < 30) {
+         surface = adjustBrightness(theme.background, 8); // Lighten slightly more if very dark
+    } else {
+         surface = adjustBrightness(theme.background, 5);
+    }
     elements.root.style.setProperty('--surface-color', surface);
     // Ensure text contrast on primary/accent if needed
     // For simplicity, keeping these fixed for now
@@ -89,14 +96,13 @@ export function extractColorsFromImage(imageElement) {
     try {
         const colorThief = new ColorThief();
 
-        // Wait for the image to be loaded (especially important after upload)
-        if (imageElement.complete && imageElement.naturalWidth > 0) { // Check naturalWidth to ensure image is loaded
-            extractColors(colorThief, imageElement);
+        // Wait for the image to be loaded
+        if (imageElement.complete && imageElement.naturalWidth > 0) {
+            _processImageColors(colorThief, imageElement);
         } else {
             imageElement.onload = function() {
-                // Check again in case onload fires before image data is ready
                 if(imageElement.naturalWidth > 0) {
-                    extractColors(colorThief, imageElement);
+                    _processImageColors(colorThief, imageElement);
                 } else {
                      console.warn("Image loaded but naturalWidth is 0, skipping color extraction.");
                 }
@@ -104,102 +110,44 @@ export function extractColorsFromImage(imageElement) {
             };
              imageElement.onerror = function() {
                  console.error("Image failed to load, cannot extract colors.");
+                 alert("Could not load the image. Color extraction failed.");
+                 // Clear any previously extracted palette
+                 state.currentSong.extractedPalette = [];
+                 updateExtractedPaletteDisplay(); // Update display to show message
                  imageElement.onerror = null; // Remove listener
              }
         }
     } catch (error) {
         console.error("Error initiating ColorThief:", error);
+        alert("Error initializing color extraction tool.");
+         // Clear any previously extracted palette
+         state.currentSong.extractedPalette = [];
+         updateExtractedPaletteDisplay();
     }
 }
 
-function extractColors(colorThief, imageElement) {
-    try {
-        // Get dominant color
-        const dominantColor = colorThief.getColor(imageElement);
+// Internal helper function to handle the actual color extraction logic
+function _processImageColors(colorThief, imageElement) {
+     try {
         // Get a palette
-        const palette = colorThief.getPalette(imageElement, 8); // Get 8 colors for more choice
+        const palette = colorThief.getPalette(imageElement, 8); // Get 8 colors
 
         // Convert RGB arrays to hex
-        const primaryHex = rgbToHex(dominantColor[0], dominantColor[1], dominantColor[2]);
         const paletteHex = palette.map(rgb => rgbToHex(rgb[0], rgb[1], rgb[2]));
 
-        // --- Store the extracted palette in state ---
+        // Store the extracted palette in state
         state.currentSong.extractedPalette = paletteHex;
-        // ---
 
-        // Choose background: Ensure it's dark. Start with dominant, darken if needed.
-        let backgroundHex = primaryHex;
-        if (calculateBrightness(dominantColor) > 128) { // If dominant is light, find a dark color in palette or darken dominant
-             backgroundHex = paletteHex.find(hex => calculateBrightness(hexToRgb(hex)) < 80) || darkenColor(primaryHex, 85); // Darken significantly
-        } else {
-            backgroundHex = darkenColor(primaryHex, 50); // Darken even if already dark-ish
-        }
-        // Ensure minimum darkness
-        if(calculateBrightness(hexToRgb(backgroundHex)) > 50) {
-             backgroundHex = '#121212'; // Force dark if necessary
-        }
+        // Only update the display of extracted swatches
+        updateExtractedPaletteDisplay();
+        // Don't save state here, as only the transient extractedPalette changed
 
-        // Choose text: Ensure it's light and contrasts with background
-        let textHex = '#e1e1e1'; // Default light text
-        const bgRgb = hexToRgb(backgroundHex);
-        if (calculateContrast(bgRgb, hexToRgb(textHex)) < 4.5) { // WCAG contrast ratio check
-             textHex = '#ffffff'; // Try pure white
-             if (calculateContrast(bgRgb, hexToRgb(textHex)) < 4.5) {
-                 // If white also fails, might need a more complex approach, but rare for dark bg
-                 console.warn("Could not find sufficient contrast for text color.");
-             }
-        }
-
-        // Choose Primary: Use dominant color unless it's too close to background
-        let primaryActualHex = primaryHex;
-        if (calculateColorDifference(primaryHex, backgroundHex) < 50 || calculateContrast(hexToRgb(primaryHex), hexToRgb(backgroundHex)) < 1.5) {
-             primaryActualHex = paletteHex.find(hex => hex !== backgroundHex && calculateContrast(hexToRgb(hex), hexToRgb(backgroundHex)) > 2) || shiftHue(backgroundHex, 180);
-        }
-
-        // Choose Secondary: Darker/Lighter shade of Primary or distinct palette color
-        let secondaryHex = paletteHex.find(hex =>
-                hex !== backgroundHex &&
-                hex !== primaryActualHex &&
-                calculateColorDifference(hex, primaryActualHex) > 80
-        ) || adjustBrightness(primaryActualHex, -20); // Darken primary as fallback
-
-        // Choose Accent: Vibrant color from palette, distinct from others
-        let accentHex = findVibrantAccent(paletteHex, [backgroundHex, primaryActualHex, secondaryHex]);
-         if (!accentHex) { // Fallback if no suitable vibrant color found
-             accentHex = shiftHue(primaryActualHex, 90); // Shift hue significantly from primary
-             if (calculateColorDifference(accentHex, backgroundHex) < 100) { // Ensure it's not too close to bg
-                 accentHex = '#03dac6'; // Default accent fallback
-             }
-         }
-
-        // Update state theme (palette is already updated)
-        state.currentSong.theme = {
-            primary: primaryActualHex,
-            secondary: secondaryHex,
-            accent: accentHex,
-            background: backgroundHex,
-            text: textHex
-        };
-
-        // Apply the new theme
-        updateThemeUI();
-        // Populate the color inputs AND the palette display in the modal if it's open
-        if (elements.colorEditModal.style.display === 'block') {
-             populateColorInputs();
-             updateExtractedPaletteDisplay(); // Call new function
-        }
-        Storage.saveCurrentSongState();
     } catch (error) {
-        // Catch errors from colorThief (e.g., CORS issues if using external images)
         console.error("Error processing image colors with ColorThief:", error);
-         // Optionally revert to default colors or show an error message
-         // state.currentSong.theme = { ...defaultTheme }; // Assuming defaultTheme exists
-         // updateThemeUI();
-         // Clear extracted palette on error
-         state.currentSong.extractedPalette = [];
-         if (elements.colorEditModal.style.display === 'block') {
-             updateExtractedPaletteDisplay();
-         }
+        alert("Failed to extract colors from the image. Please ensure it's a valid image format (JPEG, PNG, GIF).");
+        // Clear extracted palette on error
+        state.currentSong.extractedPalette = [];
+        updateExtractedPaletteDisplay();
     }
 }
 
@@ -211,6 +159,15 @@ export function updateExtractedPaletteDisplay() {
     const palette = state.currentSong.extractedPalette;
 
     if (palette && palette.length > 0) {
+        // Add a label indicating what these colors are
+        const label = document.createElement('p');
+        label.className = 'note';
+        label.style.width = '100%';
+        label.style.marginBottom = 'var(--spacing-xs)';
+        label.style.textAlign = 'left';
+        label.textContent = 'Extracted Colors (Click to Copy):';
+        paletteDisplay.appendChild(label);
+
         palette.forEach(colorHex => {
             const swatch = document.createElement('div');
             swatch.className = 'extracted-palette-swatch';
@@ -222,7 +179,11 @@ export function updateExtractedPaletteDisplay() {
                 navigator.clipboard.writeText(colorHex).then(() => {
                     // Optional: Show temporary feedback
                     swatch.style.borderColor = 'var(--accent-color)';
-                    setTimeout(() => { swatch.style.borderColor = 'rgba(255, 255, 255, 0.3)'; }, 1000);
+                    swatch.style.transform = 'scale(1.15)';
+                    setTimeout(() => {
+                        swatch.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                        swatch.style.transform = 'scale(1)';
+                     }, 1000);
                 }).catch(err => {
                     console.error('Failed to copy color:', err);
                     // Fallback for older browsers or if permission denied
@@ -234,9 +195,15 @@ export function updateExtractedPaletteDisplay() {
         });
     } else {
         // Show placeholder text if no palette exists
-        paletteDisplay.innerHTML = '<p class="note">No colors extracted from image yet. Upload an image and click "Extract from Image".</p>';
+        const placeholder = document.createElement('p');
+        placeholder.className = 'note';
+        placeholder.style.width = '100%'; // Ensure it takes full width
+        placeholder.textContent = 'No colors extracted from image yet. Upload an image and click "Extract from Image".';
+        paletteDisplay.appendChild(placeholder);
     }
 }
+
+// ... rest of the file remains the same ...
 
 function findVibrantAccent(paletteHex, existingColors) {
      let bestAccent = null;
