@@ -81,20 +81,21 @@
             </div>
 
             <div class="lyrics-section">
-                <div class="lyrics-container" id="lyrics-container">
-                    <div class="lyrics-placeholder">
-                        <p>No lyrics uploaded yet. Upload audio and lyrics to begin.</p>
-                        <div class="lyrics-buttons">
-                            <label for="upload-lyrics" class="upload-btn">
-                                <i class="fas fa-file-alt"></i> Upload Lyrics
-                            </label>
-                            <input type="file" id="upload-lyrics" accept=".txt,.lrc" class="file-input">
-                            
-                            <button id="edit-lyrics-btn" class="upload-btn">
-                                <i class="fas fa-edit"></i> Edit Lyrics
-                            </button>
-                        </div>
+                <div class="lyrics-placeholder" style="display: none;">
+                    <p>No lyrics uploaded yet. Upload audio and lyrics to begin.</p>
+                    <div class="lyrics-buttons">
+                        <label for="upload-lyrics" class="upload-btn">
+                            <i class="fas fa-file-alt"></i> Upload Lyrics
+                        </label>
+                        <input type="file" id="upload-lyrics" accept=".txt,.lrc" class="file-input">
+                        
+                        <button id="edit-lyrics-btn" class="upload-btn" style="display: none;">
+                            <i class="fas fa-edit"></i> Edit Lyrics
+                        </button>
                     </div>
+                </div>
+                <div class="lyrics-container" id="lyrics-container">
+                    <!-- Lyrics lines will be populated here -->
                 </div>
                 <div class="timing-controls">
                     <button id="next-line-btn" class="btn primary-btn">

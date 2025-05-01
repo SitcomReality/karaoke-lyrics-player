@@ -33,62 +33,68 @@ export function parseLyrics(content) {
 }
 
 export function renderLyrics() {
-    if (!state.currentSong.lyrics || !state.currentSong.lyrics.length) {
-        elements.lyricsContainer.innerHTML = ''; // Clear previous lyrics
-        elements.lyricsPlaceholder.style.display = 'flex'; // Show placeholder
-        return;
-    }
+    const hasLyrics = state.currentSong.lyrics && state.currentSong.lyrics.length > 0;
 
-    elements.lyricsPlaceholder.style.display = 'none'; // Hide placeholder
-    elements.lyricsContainer.innerHTML = ''; // Clear previous lyrics
+    // Always clear the container first
+    elements.lyricsContainer.innerHTML = '';
 
-    state.currentSong.lyrics.forEach((line, index) => {
-        const lineElement = document.createElement('div');
-        lineElement.className = 'lyrics-line';
-        lineElement.dataset.index = index;
+    if (hasLyrics) {
+        // Hide placeholder, show lyrics container content
+        elements.lyricsPlaceholder.style.display = 'none';
+        elements.lyricsContainer.style.display = 'block'; // Ensure container is visible
 
-        // Add timestamp indicator if timing exists
-        const timestamp = state.currentSong.timing[index];
-        if (timestamp !== null && timestamp !== undefined) {
-            const minutes = Math.floor(timestamp / 60);
-            const seconds = Math.floor(timestamp % 60);
-            const timeString = `[${minutes}:${seconds.toString().padStart(2, '0')}]`;
-            const timeSpan = document.createElement('span');
-            timeSpan.className = 'line-time';
-            timeSpan.textContent = timeString;
-            lineElement.appendChild(timeSpan);
-        }
+        state.currentSong.lyrics.forEach((line, index) => {
+            const lineElement = document.createElement('div');
+            lineElement.className = 'lyrics-line';
+            lineElement.dataset.index = index;
 
-        // Add lyric text
-        const textNode = document.createTextNode(` ${line}`); // Add space after timestamp
-        lineElement.appendChild(textNode);
+            // Add timestamp indicator if timing exists
+            const timestamp = state.currentSong.timing[index];
+            let timePrefix = '';
+            if (timestamp !== null && timestamp !== undefined) {
+                const minutes = Math.floor(timestamp / 60);
+                const seconds = Math.floor(timestamp % 60);
+                const timeString = `[${minutes}:${seconds.toString().padStart(2, '0')}]`;
+                const timeSpan = document.createElement('span');
+                timeSpan.className = 'line-time';
+                timeSpan.textContent = timeString;
+                lineElement.appendChild(timeSpan);
+                timePrefix = ' '; // Add space if time exists
+            }
 
+            // Add lyric text
+            const textNode = document.createTextNode(`${timePrefix}${line}`);
+            lineElement.appendChild(textNode);
 
-        if (state.editMode) {
-            lineElement.style.cursor = 'pointer';
-            lineElement.title = 'Click to set timing for this line';
-            lineElement.addEventListener('click', handleLyricLineClick);
-        } else {
-            lineElement.style.cursor = 'default';
-            lineElement.title = '';
-        }
+            if (state.editMode) {
+                lineElement.style.cursor = 'pointer';
+                lineElement.title = 'Click to set timing for this line';
+                lineElement.addEventListener('click', handleLyricLineClick);
+            } else {
+                lineElement.style.cursor = 'default';
+                lineElement.title = '';
+            }
 
-        // Highlight the current line
-        if (index === state.currentLineIndex) {
-            lineElement.classList.add('active');
-        }
+            // Highlight the current line
+            if (index === state.currentLineIndex) {
+                lineElement.classList.add('active');
+            }
 
-        elements.lyricsContainer.appendChild(lineElement);
-    });
+            elements.lyricsContainer.appendChild(lineElement);
+        });
 
-    scrollToActiveLine();
+        scrollToActiveLine();
 
-    // Update edit lyrics button visibility
-    if (state.currentSong.lyrics && state.currentSong.lyrics.length) {
-        // Show edit button next to lyrics if they exist
-        if (elements.editLyricsBtn) {
-            elements.editLyricsBtn.style.display = 'inline-flex';
-        }
+        // Show edit lyrics button if lyrics exist
+        elements.editLyricsBtn.style.display = 'inline-flex';
+
+    } else {
+        // Show placeholder, hide lyrics container content (optional, could just be empty)
+        elements.lyricsPlaceholder.style.display = 'flex';
+        elements.lyricsContainer.style.display = 'none'; // Hide container when placeholder is shown
+
+        // Hide edit lyrics button if no lyrics exist
+        elements.editLyricsBtn.style.display = 'none';
     }
 }
 
@@ -221,46 +227,56 @@ export function toggleEditMode() {
 // New function to save lyrics from the editor
 export function saveLyricsFromEditor() {
     const lyricsContent = elements.lyricsEditor.value;
-    
+
     // Store the current timing data to handle remapping
     const oldLyrics = [...state.currentSong.lyrics];
     const oldTiming = [...state.currentSong.timing];
-    
+
     // Parse the new lyrics
-    parseLyrics(lyricsContent);
-    
-    // Handle timing remapping - if number of lines has changed
-    handleTimingAfterEdit(oldLyrics, oldTiming);
-    
+    parseLyrics(lyricsContent); // This resets timing initially
+
+    // Handle timing remapping
+    handleTimingAfterEdit(oldLyrics, oldTiming); // This puts back relevant old timing
+
     // Close the modal
     Modal.closeModal(elements.lyricsEditorModal);
-    
+
     // Save to storage
     Storage.saveCurrentSongState();
-    
+
     // Update the UI
-    renderLyrics();
+    renderLyrics(); // Re-render with new lyrics and remapped timing
 }
 
 // Helper function to handle timing after lyrics edit
 function handleTimingAfterEdit(oldLyrics, oldTiming) {
-    // If there were no previous lyrics or timing, nothing to do
-    if (!oldLyrics.length || !oldTiming.length) return;
-    
-    // If the number of lines is the same, keep the timing as is
-    if (oldLyrics.length === state.currentSong.lyrics.length) return;
-    
-    // Otherwise, we need to remap timing
-    // This is a simple implementation - keep timing for lines that match exactly
+    // If there were no previous lyrics or timing, or no old timing, nothing to remap
+    if (!oldLyrics.length || !oldTiming.length || oldTiming.every(t => t === null)) {
+        // Ensure timing array is correct length even if no remapping
+        state.currentSong.timing = Array(state.currentSong.lyrics.length).fill(null);
+        return;
+    }
+
     const newTiming = Array(state.currentSong.lyrics.length).fill(null);
-    
-    state.currentSong.lyrics.forEach((line, index) => {
-        const oldIndex = oldLyrics.indexOf(line);
-        if (oldIndex !== -1 && oldIndex < oldTiming.length) {
-            newTiming[index] = oldTiming[oldIndex];
+
+    // Try to match lines exactly to preserve timing
+    const usedOldIndices = new Set();
+    state.currentSong.lyrics.forEach((newLine, newIndex) => {
+        // Find first matching old line that hasn't been used yet
+        let foundMatch = false;
+        for (let oldIndex = 0; oldIndex < oldLyrics.length; oldIndex++) {
+            if (!usedOldIndices.has(oldIndex) && oldLyrics[oldIndex] === newLine && oldTiming[oldIndex] !== null) {
+                newTiming[newIndex] = oldTiming[oldIndex];
+                usedOldIndices.add(oldIndex);
+                foundMatch = true;
+                break;
+            }
         }
     });
-    
+
+    // More advanced diff/patch could be implemented here for better remapping
+    // For now, only exact matches keep their timing.
+
     state.currentSong.timing = newTiming;
     state.currentLineIndex = -1; // Reset current line index after edit
 }

@@ -75,10 +75,10 @@ function handleSongInfoChange() {
 
 // Helper function to open the lyrics editor with current lyrics
 function openLyricsEditor() {
-    // Populate the editor with current lyrics
+    // Populate the editor with current lyrics, even if empty
     const currentLyrics = state.currentSong.lyrics.join('\n');
     elements.lyricsEditor.value = currentLyrics;
-    
+
     // Open the modal
     Modal.openModal(elements.lyricsEditorModal);
 }
