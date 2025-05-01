@@ -44,6 +44,15 @@
     background-color: var(--secondary-color);
 }
 
+.btn.active, .upload-btn.active {
+    background-color: var(--accent-color);
+    color: var(--on-primary); 
+}
+
+.btn.active:hover, .upload-btn.active:hover {
+    opacity: 0.9;
+}
+
 .small-btn {
     padding: var(--spacing-xs) var(--spacing-sm);
     font-size: var(--font-size-small);
@@ -106,6 +115,14 @@
     background-color: rgba(255, 255, 255, 0.1);
 }
 
+.flash {
+    animation: flash-animation 0.3s ease;
+}
+
+@keyframes flash-animation {
+    0% { background-color: var(--accent-color); transform: scale(1.05); }
+    100% { background-color: var(--primary-color); transform: scale(1); } 
+}
 
 /* Progress Bar */
 .progress-container {
@@ -142,7 +159,7 @@
     background-color: var(--on-primary);
     border-radius: 50%;
     box-shadow: var(--shadow-sm);
-    display: none; /* Shown on hover */
+    display: none; 
 }
 
 .progress-bar:hover .progress::after {
@@ -259,7 +276,7 @@
     cursor: pointer;
     font-size: var(--font-size-normal);
     opacity: 0.7;
-    border-bottom: 2px solid transparent; /* Reserve space */
+    border-bottom: 2px solid transparent; 
 }
 
 .tab-btn.active {
@@ -294,10 +311,10 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    background: none; /* Remove default background */
-    padding: 0; /* Remove default padding */
+    background: none; 
+    padding: 0; 
 }
-/* Add a subtle border to color inputs for better visibility */
+
 .color-input input[type="color"]::-webkit-color-swatch-wrapper {
     padding: 0;
 }
@@ -366,14 +383,14 @@
 }
 
 .playlist-item.active, .history-item.active {
-    background-color: rgba(98, 0, 234, 0.2); /* Using primary with alpha */
+    background-color: rgba(98, 0, 234, 0.2); 
     border-left: 3px solid var(--accent-color);
 }
 
 .item-info {
     flex: 1;
     overflow: hidden;
-    margin-right: var(--spacing-sm); /* Space before actions */
+    margin-right: var(--spacing-sm); 
 }
 
 .item-title {
@@ -393,7 +410,7 @@
 }
 
 .item-status {
-    display: inline-block; /* Allows padding/margin */
+    display: inline-block; 
     font-size: 10px;
     padding: 2px 6px;
     border-radius: 10px;
@@ -404,19 +421,19 @@
 }
 
 .status-complete {
-    background-color: rgba(3, 218, 198, 0.2); /* Accent with alpha */
+    background-color: rgba(3, 218, 198, 0.2); 
     color: var(--accent-color);
 }
 
 .status-incomplete {
-    background-color: rgba(255, 193, 7, 0.2); /* Yellowish */
+    background-color: rgba(255, 193, 7, 0.2); 
     color: #ffc107;
 }
 
 .item-actions {
     display: flex;
     gap: 4px;
-    flex-shrink: 0; /* Prevent actions from shrinking */
+    flex-shrink: 0; 
 }
 
 /* Lyrics editor modal */
