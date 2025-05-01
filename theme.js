@@ -4,6 +4,13 @@ import { elements } from './dom.js';
 import * as Storage from './storage.js';
 import ColorThief from 'color-thief';
 
+// Module-level variable to track theme rotation
+let themeRotationOffset = 0;
+
+export function resetThemeRotationOffset() {
+    themeRotationOffset = 0;
+}
+
 export function updateThemeUI() {
     // Update theme color previews
     elements.primaryColor.style.backgroundColor = state.currentSong.theme.primary;
@@ -103,6 +110,7 @@ export function extractColorsFromImage(imageElement) {
             imageElement.onload = function() {
                 if(imageElement.naturalWidth > 0) {
                     _processImageColors(colorThief, imageElement);
+                    resetThemeRotationOffset(); // Reset rotation when new colors are extracted
                 } else {
                      console.warn("Image loaded but naturalWidth is 0, skipping color extraction.");
                 }
@@ -114,6 +122,7 @@ export function extractColorsFromImage(imageElement) {
                  // Clear any previously extracted palette
                  state.currentSong.extractedPalette = [];
                  updateExtractedPaletteDisplay(); // Update display to show message
+                 resetThemeRotationOffset(); // Reset rotation
                  imageElement.onerror = null; // Remove listener
              }
         }
@@ -123,6 +132,7 @@ export function extractColorsFromImage(imageElement) {
          // Clear any previously extracted palette
          state.currentSong.extractedPalette = [];
          updateExtractedPaletteDisplay();
+         resetThemeRotationOffset(); // Reset rotation
     }
 }
 
@@ -193,6 +203,8 @@ export function updateExtractedPaletteDisplay() {
 
             paletteDisplay.appendChild(swatch);
         });
+        // Enable the 'Apply Extracted' button
+        elements.applyExtractedThemeBtn.disabled = false;
     } else {
         // Show placeholder text if no palette exists
         const placeholder = document.createElement('p');
@@ -200,10 +212,98 @@ export function updateExtractedPaletteDisplay() {
         placeholder.style.width = '100%'; // Ensure it takes full width
         placeholder.textContent = 'No colors extracted from image yet. Upload an image and click "Extract from Image".';
         paletteDisplay.appendChild(placeholder);
+        // Disable the 'Apply Extracted' button
+        elements.applyExtractedThemeBtn.disabled = true;
     }
 }
 
-// ... rest of the file remains the same ...
+// --- New function to apply theme based on extracted colors ---
+export function applyExtractedTheme() {
+    const palette = state.currentSong.extractedPalette;
+    if (!palette || palette.length === 0) {
+        alert("No extracted colors available. Please extract colors from an image first.");
+        return;
+    }
+
+    // Minimum number of colors needed for a full theme
+    const MIN_COLORS = 5; 
+    
+    // Rotate the palette based on the offset
+    const rotatedPalette = [...palette.slice(themeRotationOffset % palette.length), ...palette.slice(0, themeRotationOffset % palette.length)];
+    
+    // Ensure we have enough colors, duplicating if necessary
+    let usablePalette = [...rotatedPalette];
+    while (usablePalette.length < MIN_COLORS && palette.length > 0) {
+        usablePalette = usablePalette.concat(palette); // Append original palette to fill up
+    }
+    usablePalette = usablePalette.slice(0, Math.max(MIN_COLORS, palette.length)); // Trim excess if needed
+
+    // Analyze colors (brightness and saturation)
+    const analyzedPalette = usablePalette.map(hex => ({
+        hex: hex,
+        rgb: hexToRgb(hex),
+        brightness: calculateBrightness(hexToRgb(hex)),
+        saturation: calculateSaturation(hexToRgb(hex))
+    }));
+
+    // Sort by brightness (darkest first)
+    analyzedPalette.sort((a, b) => a.brightness - b.brightness);
+
+    // --- Selection Logic ---
+    let bgColor = analyzedPalette[0].hex; // Darkest for background
+    let textColor = analyzedPalette[analyzedPalette.length - 1].hex; // Lightest for text
+
+    // Check contrast and adjust if necessary
+    const contrastRatio = calculateContrast(hexToRgb(bgColor), hexToRgb(textColor));
+    if (contrastRatio < 4.5) { // WCAG AA threshold
+        console.warn(`Initial BG/Text contrast low (${contrastRatio.toFixed(2)}). Adjusting.`);
+        // Try making background darker or text lighter from the palette if possible
+        if (analyzedPalette.length > 1 && analyzedPalette[analyzedPalette.length - 2].brightness > analyzedPalette[analyzedPalette.length - 1].brightness * 0.9) {
+            // If second lightest isn't much darker, use it maybe? - tricky
+        }
+        // Simple fix: generate a compliant text color based on background
+        textColor = getContrastColor(bgColor);
+    }
+
+    // Filter out background and text colors for selecting primary/secondary/accent
+    const remainingColors = analyzedPalette.filter(c => c.hex !== bgColor && c.hex !== textColor);
+
+    // Sort remaining by saturation (most saturated first)
+    remainingColors.sort((a, b) => b.saturation - a.saturation);
+
+    let primaryColor = remainingColors.length > 0 ? remainingColors[0].hex : lightenColor(bgColor, 30); // Most saturated remaining, fallback
+    let accentColor = remainingColors.length > 1 ? remainingColors[1].hex : shiftHue(primaryColor, 120); // Second most saturated, fallback
+    let secondaryColor = remainingColors.length > 2 ? remainingColors[2].hex : darkenColor(primaryColor, 15); // Third most saturated, fallback
+
+    // Avoid primary/secondary being too similar if possible
+    if (calculateColorDifference(primaryColor, secondaryColor) < 50 && remainingColors.length > 3) {
+        secondaryColor = remainingColors[3].hex; // Try the next one
+    }
+    // Avoid accent being too similar to primary
+    if (calculateColorDifference(primaryColor, accentColor) < 50 && remainingColors.length > 3) {
+         accentColor = remainingColors.length > 2 && remainingColors[2].hex !== secondaryColor ? remainingColors[2].hex : shiftHue(primaryColor, 120); // try 3rd or generate
+    }
+
+
+    // --- Populate Inputs ---
+    elements.backgroundColorInput.value = bgColor;
+    elements.textColorInput.value = textColor;
+    elements.primaryColorInput.value = primaryColor;
+    elements.secondaryColorInput.value = secondaryColor;
+    elements.accentColorInput.value = accentColor;
+
+    // Increment rotation offset for the next click
+    themeRotationOffset++;
+}
+
+// Helper function to determine a contrasting color (simple black/white)
+function getContrastColor(hexColor) {
+    const rgb = hexToRgb(hexColor);
+    if (!rgb) return '#ffffff'; // Default to white if input is invalid
+    const brightness = calculateBrightness(rgb);
+    // Threshold can be adjusted, 128 is midpoint
+    return brightness > 128 ? '#000000' : '#ffffff'; 
+}
 
 function findVibrantAccent(paletteHex, existingColors) {
      let bestAccent = null;
@@ -260,6 +360,7 @@ function hexToRgb(hex) {
 
 // Luminance calculation helper for contrast
 function getLuminance(rgb) {
+    if (!rgb) return 0; // Handle potential null input
     const RsRGB = rgb.r / 255;
     const GsRGB = rgb.g / 255;
     const BsRGB = rgb.b / 255;
@@ -299,11 +400,9 @@ function calculateSaturation(rgb) {
     const min = Math.min(r, g, b);
     const delta = max - min;
 
-     if (max === 0) return 0; // Achromatic
+     if (max === 0 || delta === 0) return 0; // Achromatic or single color
 
     const lightness = (max + min) / 2;
-
-    if (max === min) return 0; // Achromatic
 
      let saturation;
      if (lightness < 0.5) {

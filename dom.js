@@ -77,6 +77,7 @@ export const elements = {
     applyColorsBtn: document.getElementById('apply-colors-btn'),
     extractColorsBtn: document.getElementById('extract-colors-btn'),
     extractedPaletteDisplay: document.getElementById('extracted-palette-display'),
+    applyExtractedThemeBtn: document.getElementById('apply-extracted-theme-btn'),
 
     // Font modal
     customFontInput: document.getElementById('custom-font-input'),

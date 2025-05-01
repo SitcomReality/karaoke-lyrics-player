@@ -43,6 +43,7 @@ export function setupEventListeners() {
     // Theme/Color editing modal handlers
     elements.applyColorsBtn.addEventListener('click', handleApplyColors);
     elements.extractColorsBtn.addEventListener('click', () => Theme.extractColorsFromImage(elements.songImage));
+    elements.applyExtractedThemeBtn.addEventListener('click', Theme.applyExtractedTheme); 
 
     // Font selection
     elements.fontSelector.addEventListener('change', handleFontChange);
@@ -106,6 +107,8 @@ function handleOpenColorEditor() {
     Theme.populateColorInputs();
     // Populate the extracted palette display
     Theme.updateExtractedPaletteDisplay();
+    // Reset rotation offset when modal opens
+    Theme.resetThemeRotationOffset(); 
     Modal.openModal(elements.colorEditModal);
 }
 
