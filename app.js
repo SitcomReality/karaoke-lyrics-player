@@ -17,6 +17,9 @@ function init() {
 
     // Set up event listeners
     Events.setupEventListeners();
+    
+    // Set up import/export functionality
+    ImportExport.setupImportExport();
 
     // Update UI with current state
     UI.updateUI();
