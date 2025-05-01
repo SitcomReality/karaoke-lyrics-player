@@ -40,6 +40,17 @@ export function updateThemeUI() {
 }
 
 /**
+ * Converts a hex color to its RGB components string (e.g., "255, 0, 128").
+ * @param {string} hex - Hex color string.
+ * @returns {string} RGB component string or default if invalid.
+ */
+function hexToRgbString(hex) {
+    const rgb = ColorUtils.hexToRgb(hex);
+    if (!rgb) return '255, 255, 255'; // Default to white if conversion fails
+    return `${rgb.r}, ${rgb.g}, ${rgb.b}`;
+}
+
+/**
  * Applies the given theme object to the document's CSS variables.
  * @param {object} theme - The theme object with color properties.
  */

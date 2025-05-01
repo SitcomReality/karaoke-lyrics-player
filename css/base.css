@@ -1,4 +1,3 @@
-/* css/base.css */
 :root {
     /* Default theme colors */
     --primary-color: #6200ea;
@@ -12,6 +11,12 @@
     --on-background: #e1e1e1;
     --on-surface: #e1e1e1;
     --on-error: #000000;
+
+    /* RGB versions for alpha transparency */
+    --rgb-on-background: 225, 225, 225; /* Default: e1e1e1 */
+    --rgb-on-surface: 225, 225, 225;    /* Default: e1e1e1 */
+    --rgb-primary: 98, 0, 234;         /* Default: 6200ea */
+    --rgb-accent: 3, 218, 198;          /* Default: 03dac6 */
 
     /* Font settings */
     --font-family: 'Roboto', sans-serif;
@@ -55,9 +60,9 @@ html, body {
 /* Basic element styling */
 textarea {
     width: 100%;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(var(--rgb-on-surface), 0.05); /* Use variable */
     color: var(--on-surface);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(var(--rgb-on-surface), 0.1); /* Use variable */
     border-radius: 4px;
     padding: var(--spacing-sm);
     font-family: monospace;
@@ -65,17 +70,21 @@ textarea {
     margin: var(--spacing-sm) 0 var(--spacing-md);
 }
 
+textarea::placeholder {
+    color: rgba(var(--rgb-on-surface), 0.5); /* Use variable */
+}
+
 h3 {
     margin-bottom: var(--spacing-sm);
     font-size: var(--font-size-large);
-    color: var(--accent-color);
+    color: var(--accent-color); /* Accent color is often okay for headings */
     padding-bottom: var(--spacing-xs);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(var(--rgb-on-surface), 0.1); /* Use variable */
 }
 
 p.note {
     font-size: var(--font-size-small);
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(var(--rgb-on-surface), 0.6); /* Use variable */
     font-style: italic;
     margin-top: var(--spacing-xs);
 }
@@ -84,10 +93,14 @@ input[type="text"].editable-title {
     background: transparent;
     border: none;
     border-bottom: 1px solid transparent;
-    color: var(--on-surface);
+    color: var(--on-surface); /* Use variable */
     font-weight: bold;
     padding: var(--spacing-xs);
     transition: var(--transition-fast);
+}
+
+input[type="text"].editable-title::placeholder {
+    color: rgba(var(--rgb-on-surface), 0.5); /* Use variable */
 }
 
 input[type="text"].editable-title:hover,
@@ -102,6 +115,5 @@ input[type="text"].editable-title:focus {
 
 #song-artist {
     font-size: var(--font-size-large);
-    color: var(--on-surface);
-    opacity: 0.8;
+    color: rgba(var(--rgb-on-surface), 0.8); /* Use variable */
 }

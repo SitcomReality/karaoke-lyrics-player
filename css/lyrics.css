@@ -9,23 +9,23 @@
     position: relative;
     font-size: var(--font-size-large);
     line-height: 1.5; /* Improve readability */
+    color: var(--on-surface); /* Base lyric line color */
 }
 
 .lyrics-line .line-time {
     display: inline-block;
     font-size: var(--font-size-small);
-    color: var(--on-surface);
-    opacity: 0.5; /* Use opacity for faded look */
+    color: rgba(var(--rgb-on-surface), 0.4); /* Use variable */
     margin-right: var(--spacing-sm);
     font-family: monospace;
 }
 
 .lyrics-line:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(var(--rgb-on-surface), 0.05); /* Use variable */
 }
 
 .lyrics-line.active {
-    background-color: rgba(98, 0, 234, 0.2); /* Primary color with alpha */
+    background-color: rgba(var(--rgb-primary), 0.2); /* Use variable */
     color: var(--accent-color);
     font-weight: bold;
 }
@@ -36,7 +36,7 @@
 }
 
 .lyrics-container.edit-mode .lyrics-line:hover {
-    background-color: rgba(255, 255, 255, 0.1); /* Slightly stronger hover */
+    background-color: rgba(var(--rgb-on-surface), 0.1); /* Use variable */
 }
 
 
