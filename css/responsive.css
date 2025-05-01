@@ -1,0 +1,141 @@
+/* css/responsive.css */
+
+/* Make sure the app works on smaller screens */
+@media (max-width: 1200px) {
+    .app-container {
+        flex-direction: column;
+        height: auto; /* Allow vertical scrolling */
+        min-height: 100vh; /* Ensure it fills viewport height */
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        max-height: 250px; /* Increased max height */
+        flex-direction: row; /* Sidebars become horizontal sections */
+        flex-wrap: wrap; /* Allow sections to wrap */
+        justify-content: space-around; /* Distribute sections */
+        padding: var(--spacing-sm);
+        overflow-y: visible; /* Remove internal scroll */
+    }
+
+    .sidebar-section {
+        flex: 1 1 250px; /* Allow sections to grow/shrink */
+        margin-bottom: var(--spacing-md); /* Spacing when wrapped */
+    }
+
+    .left-sidebar {
+        order: 1; /* History/Playlists first */
+    }
+
+    .main-content {
+        order: 2; /* Main content second */
+        height: auto; /* Let content determine height */
+        flex: none; /* Remove flex grow */
+        min-height: 400px; /* Ensure some minimum height */
+    }
+
+    .right-sidebar {
+        order: 3; /* Playlist/Theme last */
+        max-height: none; /* Allow right sidebar to expand if needed */
+    }
+}
+
+/* For devices that are even smaller */
+@media (max-width: 768px) {
+    .header-section {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-md);
+    }
+
+    .song-header {
+        justify-content: center; /* Center song info */
+        text-align: center;
+    }
+
+    .song-info {
+       align-items: center; /* Center title/artist text */
+    }
+
+    .upload-section {
+        justify-content: space-around; /* Space out upload buttons */
+        flex-wrap: wrap; /* Allow buttons to wrap */
+    }
+
+    .upload-btn {
+        flex: 1 1 120px; /* Allow buttons to take space and wrap */
+        justify-content: center;
+        text-align: center;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .timing-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .timing-controls .btn {
+        flex: 1 1 150px; /* Allow buttons to wrap nicely */
+        justify-content: center;
+        margin: var(--spacing-xs);
+    }
+
+    .player-section .controls {
+        flex-wrap: wrap;
+        justify-content: center; /* Center controls when wrapped */
+    }
+
+    .progress-container {
+        order: 1; /* Put progress bar first when wrapped */
+        width: 100%;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .control-btn { order: 2; } /* Play button */
+    .volume-control { order: 3; } /* Volume */
+
+    .modal-content {
+        width: 90%;
+        margin: 5% auto; /* Less top margin */
+    }
+
+    .color-inputs {
+        grid-template-columns: 1fr; /* Stack color inputs vertically */
+    }
+}
+
+@media (max-width: 480px) {
+     :root {
+        /* Slightly smaller base font size for very small screens */
+        --font-size-normal: 0.95rem;
+    }
+
+    .sidebar {
+         max-height: none; /* Remove max-height constraint */
+         flex-direction: column; /* Stack sidebar sections */
+    }
+
+    .sidebar-section {
+        flex-basis: auto; /* Reset flex basis */
+    }
+
+    #song-image-container {
+        width: 60px;
+        height: 60px;
+    }
+
+    .lyrics-line {
+        font-size: var(--font-size-normal); /* Adjust lyric size */
+    }
+
+    .upload-btn, .btn {
+        font-size: var(--font-size-small); /* Smaller button text */
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    .control-btn {
+        width: 35px;
+        height: 35px;
+    }
+}

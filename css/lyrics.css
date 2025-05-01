@@ -1,0 +1,53 @@
+/* css/lyrics.css */
+
+.lyrics-line {
+    padding: var(--spacing-xs) var(--spacing-md);
+    margin: var(--spacing-xs) 0;
+    border-radius: 4px;
+    transition: background-color var(--transition-normal), color var(--transition-normal);
+    cursor: default; /* Default cursor, changed in edit mode */
+    position: relative;
+    font-size: var(--font-size-large);
+    line-height: 1.5; /* Improve readability */
+}
+
+.lyrics-line .line-time {
+    display: inline-block;
+    font-size: var(--font-size-small);
+    color: rgba(255, 255, 255, 0.4);
+    margin-right: var(--spacing-sm);
+    font-family: monospace;
+}
+
+.lyrics-line:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.lyrics-line.active {
+    background-color: rgba(98, 0, 234, 0.2); /* Primary color with alpha */
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+/* Edit mode specific styles */
+.lyrics-container.edit-mode .lyrics-line {
+    cursor: pointer;
+}
+
+.lyrics-container.edit-mode .lyrics-line:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Slightly stronger hover */
+}
+
+
+/* Highlighted word in lyrics (if implemented later) */
+.word {
+    display: inline-block;
+    padding: 0 2px;
+    border-radius: 3px;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.word.active {
+    background-color: var(--accent-color);
+    color: var(--on-primary); /* Use on-primary for contrast with accent */
+}
