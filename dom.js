@@ -85,6 +85,13 @@ export const elements = {
     availableSongsList: document.getElementById('available-songs-list'),
     savePlaylistBtn: document.getElementById('save-playlist-btn'),
 
+    // Lyrics editing
+    editLyricsBtn: document.getElementById('edit-lyrics-btn'),
+    lyricsEditorModal: document.getElementById('lyrics-editor-modal'),
+    lyricsEditor: document.getElementById('lyrics-editor'),
+    saveLyricsBtn: document.getElementById('save-lyrics-btn'),
+    cancelLyricsBtn: document.getElementById('cancel-lyrics-btn'),
+
     // Root element for theme variables
     root: document.documentElement,
 };

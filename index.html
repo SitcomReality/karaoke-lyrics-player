@@ -84,10 +84,16 @@
                 <div class="lyrics-container" id="lyrics-container">
                     <div class="lyrics-placeholder">
                         <p>No lyrics uploaded yet. Upload audio and lyrics to begin.</p>
-                        <label for="upload-lyrics" class="upload-btn">
-                            <i class="fas fa-file-alt"></i> Upload Lyrics
-                        </label>
-                        <input type="file" id="upload-lyrics" accept=".txt,.lrc" class="file-input">
+                        <div class="lyrics-buttons">
+                            <label for="upload-lyrics" class="upload-btn">
+                                <i class="fas fa-file-alt"></i> Upload Lyrics
+                            </label>
+                            <input type="file" id="upload-lyrics" accept=".txt,.lrc" class="file-input">
+                            
+                            <button id="edit-lyrics-btn" class="upload-btn">
+                                <i class="fas fa-edit"></i> Edit Lyrics
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="timing-controls">
@@ -220,6 +226,19 @@
                 <div id="available-songs-list" class="checklist"></div>
             </div>
             <button id="save-playlist-btn" class="btn primary-btn">Save Playlist</button>
+        </div>
+    </div>
+
+    <div id="lyrics-editor-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Lyrics</h2>
+            <p class="note">Enter each line of lyrics on a separate line.</p>
+            <textarea id="lyrics-editor" rows="20" placeholder="Enter lyrics here..."></textarea>
+            <div class="modal-actions">
+                <button id="save-lyrics-btn" class="btn primary-btn">Save Lyrics</button>
+                <button id="cancel-lyrics-btn" class="btn">Cancel</button>
+            </div>
         </div>
     </div>
 

@@ -3,6 +3,7 @@ import { state } from './state.js';
 import { elements } from './dom.js';
 import * as Storage from './storage.js';
 import * as UI from './ui.js'; // May need UI updates after actions
+import * as Modal from './modal.js';
 
 export function handleLyricsUpload(e) {
     const file = e.target.files[0];
@@ -81,6 +82,14 @@ export function renderLyrics() {
     });
 
     scrollToActiveLine();
+
+    // Update edit lyrics button visibility
+    if (state.currentSong.lyrics && state.currentSong.lyrics.length) {
+        // Show edit button next to lyrics if they exist
+        if (elements.editLyricsBtn) {
+            elements.editLyricsBtn.style.display = 'inline-flex';
+        }
+    }
 }
 
 function handleLyricLineClick(event) {
@@ -127,7 +136,6 @@ export function updateHighlightedLyrics() {
         renderLyrics(); // Re-render will handle highlight and scroll
     }
 }
-
 
 function scrollToActiveLine() {
     if (state.currentLineIndex >= 0) {
@@ -208,4 +216,51 @@ export function toggleEditMode() {
 
     // Re-render lyrics to add/remove click listeners and update styles
     renderLyrics();
+}
+
+// New function to save lyrics from the editor
+export function saveLyricsFromEditor() {
+    const lyricsContent = elements.lyricsEditor.value;
+    
+    // Store the current timing data to handle remapping
+    const oldLyrics = [...state.currentSong.lyrics];
+    const oldTiming = [...state.currentSong.timing];
+    
+    // Parse the new lyrics
+    parseLyrics(lyricsContent);
+    
+    // Handle timing remapping - if number of lines has changed
+    handleTimingAfterEdit(oldLyrics, oldTiming);
+    
+    // Close the modal
+    Modal.closeModal(elements.lyricsEditorModal);
+    
+    // Save to storage
+    Storage.saveCurrentSongState();
+    
+    // Update the UI
+    renderLyrics();
+}
+
+// Helper function to handle timing after lyrics edit
+function handleTimingAfterEdit(oldLyrics, oldTiming) {
+    // If there were no previous lyrics or timing, nothing to do
+    if (!oldLyrics.length || !oldTiming.length) return;
+    
+    // If the number of lines is the same, keep the timing as is
+    if (oldLyrics.length === state.currentSong.lyrics.length) return;
+    
+    // Otherwise, we need to remap timing
+    // This is a simple implementation - keep timing for lines that match exactly
+    const newTiming = Array(state.currentSong.lyrics.length).fill(null);
+    
+    state.currentSong.lyrics.forEach((line, index) => {
+        const oldIndex = oldLyrics.indexOf(line);
+        if (oldIndex !== -1 && oldIndex < oldTiming.length) {
+            newTiming[index] = oldTiming[oldIndex];
+        }
+    });
+    
+    state.currentSong.timing = newTiming;
+    state.currentLineIndex = -1; // Reset current line index after edit
 }

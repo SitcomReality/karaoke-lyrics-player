@@ -418,3 +418,31 @@
     gap: 4px;
     flex-shrink: 0; /* Prevent actions from shrinking */
 }
+
+/* Lyrics editor modal */
+#lyrics-editor {
+    width: 100%;
+    min-height: 300px;
+    background-color: rgba(0, 0, 0, 0.2);
+    color: var(--on-surface);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: var(--spacing-sm);
+    font-family: var(--font-family);
+    font-size: var(--font-size-normal);
+    line-height: 1.5;
+    resize: vertical;
+    margin: var(--spacing-sm) 0 var(--spacing-md);
+}
+
+.modal-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+}
+
+.lyrics-buttons {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: center;
+}

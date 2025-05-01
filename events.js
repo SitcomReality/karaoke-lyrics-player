@@ -26,6 +26,11 @@ export function setupEventListeners() {
     elements.editTimingModeBtn.addEventListener('click', Lyrics.toggleEditMode);
     elements.saveProjectBtn.addEventListener('click', Storage.saveProject);
     
+    // Lyrics editing
+    elements.editLyricsBtn.addEventListener('click', () => openLyricsEditor());
+    elements.saveLyricsBtn.addEventListener('click', Lyrics.saveLyricsFromEditor);
+    elements.cancelLyricsBtn.addEventListener('click', () => Modal.closeModal(elements.lyricsEditorModal));
+    
     // Song info editing
     elements.songTitle.addEventListener('input', handleSongInfoChange);
     elements.songArtist.addEventListener('input', handleSongInfoChange);
@@ -66,4 +71,14 @@ function handleSongInfoChange() {
     state.currentSong.title = elements.songTitle.value;
     state.currentSong.artist = elements.songArtist.value;
     Storage.saveCurrentSongState();
+}
+
+// Helper function to open the lyrics editor with current lyrics
+function openLyricsEditor() {
+    // Populate the editor with current lyrics
+    const currentLyrics = state.currentSong.lyrics.join('\n');
+    elements.lyricsEditor.value = currentLyrics;
+    
+    // Open the modal
+    Modal.openModal(elements.lyricsEditorModal);
 }
