@@ -79,6 +79,7 @@
 .upload-section {
     display: flex;
     gap: var(--spacing-sm);
+    align-items: center;
 }
 
 /* Player section */

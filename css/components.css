@@ -103,6 +103,18 @@
     display: none;
 }
 
+.file-info-display {
+    font-size: var(--font-size-small);
+    color: rgba(255, 255, 255, 0.6);
+    margin-left: var(--spacing-sm);
+    font-style: italic;
+    max-width: 150px; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    align-self: center; 
+}
+
 .control-btn {
     background-color: var(--primary-color);
     color: var(--on-primary);

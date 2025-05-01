@@ -11,6 +11,7 @@ export const state = {
         timing: [],
         image: null, // Should store image URL or reference, not base64 if possible
         audioUrl: null, // Store URL for audio file if loaded via ObjectURL
+        audioFilename: null, // Store the original filename of the uploaded audio
         theme: {
             primary: '#6200ea',
             secondary: '#3700b3',
@@ -32,6 +33,14 @@ export const state = {
 };
 
 export function resetCurrentSong() {
+    // Revoke URLs if they exist before resetting
+    if (state.currentSong.audioUrl) {
+        URL.revokeObjectURL(state.currentSong.audioUrl);
+    }
+    if (state.currentSong.image && state.currentSong.image.startsWith('blob:')) {
+        URL.revokeObjectURL(state.currentSong.image);
+    }
+
     state.currentSong = {
         id: Date.now().toString(), // Assign a unique ID when resetting
         title: '',
@@ -40,6 +49,7 @@ export function resetCurrentSong() {
         timing: [],
         image: null,
         audioUrl: null,
+        audioFilename: null, // Reset filename
         theme: {
             primary: '#6200ea',
             secondary: '#3700b3',
@@ -49,6 +59,9 @@ export function resetCurrentSong() {
         },
         font: 'Roboto'
     };
+    if (state.audio) {
+        state.audio.pause(); // Stop playback if any
+    }
     state.audio = null;
     state.isPlaying = false;
     state.currentTime = 0;

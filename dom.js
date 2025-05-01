@@ -15,13 +15,14 @@ export const elements = {
 
     // Lyrics
     lyricsContainer: document.getElementById('lyrics-container'),
-    lyricsPlaceholder: document.querySelector('.lyrics-placeholder'), 
+    lyricsPlaceholder: document.querySelector('.lyrics-placeholder'),
 
     // Upload controls
     uploadAudio: document.getElementById('upload-audio'),
     uploadImage: document.getElementById('upload-image'),
     uploadLyrics: document.getElementById('upload-lyrics'),
-    lyricsUploadLabel: document.querySelector('label[for="upload-lyrics"]'), 
+    lyricsUploadLabel: document.querySelector('label[for="upload-lyrics"]'),
+    audioFileInfo: document.getElementById('audio-file-info'), 
 
     // Timing controls
     nextLineBtn: document.getElementById('next-line-btn'),

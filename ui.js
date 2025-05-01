@@ -14,6 +14,7 @@ export { updateHistoryPanel, updatePlaylistsPanel, updateCurrentPlaylistPanel, u
 function updateUI() {
     updateSongInfo();
     updateSongImage();
+    updateAudioFileInfo(); // Add call to update audio file info display
     Lyrics.renderLyrics(); // Render lyrics based on current state
     Theme.updateThemeUI(); // Update theme display and apply styles
     updateHistoryPanel();
@@ -31,10 +32,37 @@ function updateSongInfo() {
 }
 
 function updateSongImage() {
-    if (state.currentSong.image) {
-        elements.songImage.src = state.currentSong.image;
+    if (state.currentSong.image && state.currentSong.image !== 'default-song-image.png') {
+         // Use Object URL if available and valid
+         if (state.currentSong.image.startsWith('blob:')) {
+             elements.songImage.src = state.currentSong.image;
+         } else {
+             // Handle potential non-blob string references if needed, otherwise default
+             console.warn("Unhandled image source type:", state.currentSong.image);
+             elements.songImage.src = 'default-song-image.png';
+         }
     } else {
         elements.songImage.src = 'default-song-image.png';
+    }
+     // Handle potential errors loading the image (e.g., revoked Blob URL)
+    elements.songImage.onerror = () => {
+        console.warn("Failed to load song image, reverting to default.");
+        elements.songImage.src = 'default-song-image.png';
+        // Clear potentially invalid image state
+        if (state.currentSong.image && state.currentSong.image.startsWith('blob:')) {
+            state.currentSong.image = null;
+            Storage.saveCurrentSongState(); // Save the cleared state
+        }
+    };
+}
+
+function updateAudioFileInfo() {
+    if (state.currentSong.audioFilename) {
+        elements.audioFileInfo.textContent = `Loaded: ${state.currentSong.audioFilename}`;
+        elements.audioFileInfo.title = state.currentSong.audioFilename; // Show full name on hover
+    } else {
+        elements.audioFileInfo.textContent = 'No audio file loaded';
+        elements.audioFileInfo.title = '';
     }
 }
 
@@ -119,7 +147,6 @@ function updateHistoryPanel() {
         });
     });
 }
-
 
 function updatePlaylistsPanel() {
     const playlists = getPlaylists(); // Use getter
@@ -214,7 +241,6 @@ function updatePlaylistsPanel() {
     });
 }
 
-
 function updateCurrentPlaylistPanel() {
     const currentPlaylist = getCurrentPlaylist(); // Use getter function
     if (!currentPlaylist || !currentPlaylist.songs || currentPlaylist.songs.length === 0) {
@@ -287,7 +313,6 @@ function updateCurrentPlaylistPanel() {
     elements.nextSongBtn.disabled = currentPlaylist.songs.length <= 1;
 }
 
-
 function updatePlayerControls() {
     // Update audio controls based on current state
     if (state.isPlaying) {
@@ -308,7 +333,6 @@ function updatePlayerControls() {
      // Disable play button if no audio is loaded
     elements.playBtn.disabled = !state.audio;
 }
-
 
 function updateProgressUI() {
     if (state.audio && state.duration > 0 && state.currentTime >= 0) {

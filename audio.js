@@ -7,6 +7,8 @@ import * as Lyrics from './lyrics.js';
 import * as Storage from './storage.js';
 
 export function setupInitialAudio() {
+    // Initial audio setup logic remains the same,
+    // audioFilename will be null initially or after page load, which is correct.
     if (state.currentSong && state.currentSong.audioUrl) {
         // If there's an audio URL stored in the current song state (e.g., from session storage)
         // We need to be careful here, as Blob URLs might not persist across page loads
@@ -17,7 +19,9 @@ export function setupInitialAudio() {
         } catch (e) {
             console.warn("Could not reload audio from stored URL:", e);
             state.currentSong.audioUrl = null; // Clear invalid URL
+            state.currentSong.audioFilename = null; // Clear filename too
             state.audio = null;
+            UI.updateUI(); // Update UI to reflect cleared audio state
         }
     }
 }
@@ -125,6 +129,7 @@ export function handleAudioUpload(e) {
     const audioUrl = URL.createObjectURL(file);
     state.audio = new Audio(audioUrl);
     state.currentSong.audioUrl = audioUrl; // Store the URL
+    state.currentSong.audioFilename = file.name; // Store the filename
     state.isPlaying = false;
     state.currentTime = 0;
     elements.playBtn.innerHTML = '<i class="fas fa-play"></i>';
@@ -145,5 +150,5 @@ export function handleAudioUpload(e) {
     }
 
     Storage.saveCurrentSongState(); // Save potentially updated title/artist and audioUrl
-    UI.updateUI(); // Update the entire UI, which includes song info fields
+    UI.updateUI(); // Update the entire UI, which includes song info fields and the new audio filename
 }
