@@ -136,7 +136,8 @@
     align-items: center;
     padding: var(--spacing-lg);
     gap: var(--spacing-md);
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--on-surface);
+    opacity: 0.5;
     text-align: center;
     z-index: 1;
     background-color: var(--surface-color);

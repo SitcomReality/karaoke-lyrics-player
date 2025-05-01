@@ -14,7 +14,8 @@
 .lyrics-line .line-time {
     display: inline-block;
     font-size: var(--font-size-small);
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--on-surface);
+    opacity: 0.5; /* Use opacity for faded look */
     margin-right: var(--spacing-sm);
     font-family: monospace;
 }

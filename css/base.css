@@ -102,5 +102,6 @@ input[type="text"].editable-title:focus {
 
 #song-artist {
     font-size: var(--font-size-large);
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--on-surface);
+    opacity: 0.8;
 }
