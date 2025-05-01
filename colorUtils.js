@@ -17,6 +17,7 @@ export function rgbToHex(r, g, b) {
  * @returns {{r: number, g: number, b: number} | null} RGB object or null if invalid hex.
  */
 export function hexToRgb(hex) {
+    if (!hex) return null; // Handle null or undefined input
     // Expand shorthand form (e.g. "03F") to full form ("0033FF")
     const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
     hex = hex.replace(shorthandRegex, (m, r, g, b) => {
@@ -38,9 +39,10 @@ export function hexToRgb(hex) {
  * @param {number} r - Red value.
  * @param {number} g - Green value.
  * @param {number} b - Blue value.
- * @returns {{h: number, s: number, l: number}} HSL object.
+ * @returns {{h: number, s: number, l: number} | null} HSL object or null if input is invalid.
  */
 export function rgbToHsl(r, g, b) {
+    if (r == null || g == null || b == null) return null;
     r /= 255; g /= 255; b /= 255;
     const max = Math.max(r, g, b), min = Math.min(r, g, b);
     let h, s, l = (max + min) / 2;
@@ -68,9 +70,10 @@ export function rgbToHsl(r, g, b) {
  * @param {number} h - Hue.
  * @param {number} s - Saturation.
  * @param {number} l - Lightness.
- * @returns {{r: number, g: number, b: number}} RGB object.
+ * @returns {{r: number, g: number, b: number} | null} RGB object or null if input is invalid.
  */
 export function hslToRgb(h, s, l) {
+    if (h == null || s == null || l == null) return null;
     h /= 360; s /= 100; l /= 100;
     let r, g, b;
 
@@ -101,7 +104,7 @@ export function hslToRgb(h, s, l) {
 
 /**
  * Calculates the relative luminance of an RGB color.
- * @param {{r: number, g: number, b: number}} rgb - RGB object.
+ * @param {{r: number, g: number, b: number} | null} rgb - RGB object.
  * @returns {number} Luminance value (0-1).
  */
 export function getLuminance(rgb) {
@@ -119,8 +122,8 @@ export function getLuminance(rgb) {
 
 /**
  * Calculates the WCAG contrast ratio between two RGB colors.
- * @param {{r: number, g: number, b: number}} rgb1 - First RGB color.
- * @param {{r: number, g: number, b: number}} rgb2 - Second RGB color.
+ * @param {{r: number, g: number, b: number} | null} rgb1 - First RGB color.
+ * @param {{r: number, g: number, b: number} | null} rgb2 - Second RGB color.
  * @returns {number} Contrast ratio (1-21).
  */
 export function calculateContrast(rgb1, rgb2) {
@@ -135,8 +138,22 @@ export function calculateContrast(rgb1, rgb2) {
 }
 
 /**
+ * Checks if two colors meet a minimum contrast ratio (WCAG AA for normal text).
+ * @param {string} color1Hex - First hex color string.
+ * @param {string} color2Hex - Second hex color string.
+ * @param {number} [minRatio=4.5] - The minimum required contrast ratio.
+ * @returns {boolean} True if contrast is sufficient, false otherwise.
+ */
+export function ensureContrast(color1Hex, color2Hex, minRatio = 4.5) {
+    const rgb1 = hexToRgb(color1Hex);
+    const rgb2 = hexToRgb(color2Hex);
+    if (!rgb1 || !rgb2) return false; // Cannot ensure contrast if colors are invalid
+    return calculateContrast(rgb1, rgb2) >= minRatio;
+}
+
+/**
  * Calculates a simple perceived brightness of an RGB color.
- * @param {{r: number, g: number, b: number}} rgb - RGB object.
+ * @param {{r: number, g: number, b: number} | null} rgb - RGB object.
  * @returns {number} Brightness value (0-255).
  */
 export function calculateBrightness(rgb) {
@@ -146,11 +163,11 @@ export function calculateBrightness(rgb) {
 
 /**
  * Calculates the saturation of an RGB color in HSL space.
- * @param {{r: number, g: number, b: number}} rgb - RGB object.
+ * @param {{r: number, g: number, b: number} | null} rgb - RGB object.
  * @returns {number} Saturation value (0-100).
  */
 export function calculateSaturation(rgb) {
-     if (!rgb) return 0;
+    if (!rgb) return 0;
     const r = rgb.r / 255;
     const g = rgb.g / 255;
     const b = rgb.b / 255;
@@ -159,103 +176,16 @@ export function calculateSaturation(rgb) {
     const min = Math.min(r, g, b);
     const delta = max - min;
 
-     if (max === 0 || delta === 0) return 0; // Achromatic or single color
+    if (max === 0 || delta === 0) return 0; // Achromatic or single color
 
     const lightness = (max + min) / 2;
 
-     let saturation;
-     if (lightness < 0.5) {
-         saturation = delta / (max + min);
-     } else {
-         saturation = delta / (2 - max - min);
-     }
+    let saturation;
+    if (lightness < 0.5) {
+        saturation = delta / (max + min);
+    } else {
+        saturation = delta / (2 - max - min);
+    }
 
     return saturation * 100;
-}
-
-/**
- * Determines a contrasting color (simple black or white) for a given hex color.
- * @param {string} hexColor - The hex color string.
- * @returns {string} "#000000" or "#ffffff".
- */
-export function getContrastColor(hexColor) {
-    const rgb = hexToRgb(hexColor);
-    if (!rgb) return '#ffffff'; // Default to white if input is invalid
-    // Calculate luminance using a common formula
-    const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-    // Threshold can be adjusted, 0.5 is midpoint
-    return luminance > 0.5 ? '#000000' : '#ffffff';
-}
-
-/**
- * Calculates the simple Euclidean distance between two colors in RGB space.
- * @param {string} color1 - First hex color string.
- * @param {string} color2 - Second hex color string.
- * @returns {number} The distance value.
- */
-export function calculateColorDifference(color1, color2) {
-    const rgb1 = hexToRgb(color1);
-    const rgb2 = hexToRgb(color2);
-    if (!rgb1 || !rgb2) return 0;
-
-    return Math.sqrt(
-        Math.pow(rgb1.r - rgb2.r, 2) +
-        Math.pow(rgb1.g - rgb2.g, 2) +
-        Math.pow(rgb1.b - rgb2.b, 2)
-    );
-}
-
-/**
- * Adjusts the brightness (lightness in HSL) of a hex color.
- * @param {string} color - The hex color string.
- * @param {number} percent - Percentage to adjust lightness by (positive to lighten, negative to darken).
- * @returns {string} The adjusted hex color string.
- */
-export function adjustBrightness(color, percent) {
-     const rgb = hexToRgb(color);
-     if (!rgb) return color;
-     const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-
-     hsl.l = Math.max(0, Math.min(100, hsl.l + percent)); // Adjust lightness
-
-     const newRgb = hslToRgb(hsl.h, hsl.s, hsl.l);
-     return rgbToHex(newRgb.r, newRgb.g, newRgb.b);
- }
-
-/**
- * Darkens a hex color by a given percentage.
- * @param {string} color - The hex color string.
- * @param {number} percent - Percentage to darken by (0-100).
- * @returns {string} The darkened hex color string.
- */
- export function darkenColor(color, percent) {
-     return adjustBrightness(color, -Math.abs(percent));
- }
-
-/**
- * Lightens a hex color by a given percentage.
- * @param {string} color - The hex color string.
- * @param {number} percent - Percentage to lighten by (0-100).
- * @returns {string} The lightened hex color string.
- */
- export function lightenColor(color, percent) {
-     return adjustBrightness(color, Math.abs(percent));
- }
-
-/**
- * Shifts the hue of a hex color by a given number of degrees.
- * @param {string} color - The hex color string.
- * @param {number} degrees - Degrees to shift the hue by (0-360).
- * @returns {string} The hue-shifted hex color string.
- */
-export function shiftHue(color, degrees) {
-    const rgb = hexToRgb(color);
-    if (!rgb) return color; // Return original if invalid
-    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-
-    hsl.h = (hsl.h + degrees) % 360;
-    if (hsl.h < 0) hsl.h += 360; // Ensure positive hue
-
-    const newRgb = hslToRgb(hsl.h, hsl.s, hsl.l);
-    return rgbToHex(newRgb.r, newRgb.g, newRgb.b);
 }
