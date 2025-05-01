@@ -40,7 +40,7 @@ export function setupEventListeners() {
     // Modal buttons
     elements.importExportBtn.addEventListener('click', () => Modal.openModal(elements.importExportModal));
     elements.editColorsBtn.addEventListener('click', handleOpenColorEditor);
-    elements.createPlaylistBtn.addEventListener('click', () => Modal.openModal(elements.createPlaylistModal));
+    elements.createPlaylistBtn.addEventListener('click', Playlist.openCreatePlaylistModal); // Call dedicated function
 
     // Theme/Color editing modal handlers
     elements.applyColorsBtn.addEventListener('click', handleApplyColors);
@@ -55,7 +55,8 @@ export function setupEventListeners() {
     elements.prevSongBtn.addEventListener('click', () => Playlist.playPreviousSong()); // Added event listener
     elements.nextSongBtn.addEventListener('click', () => Playlist.playNextSong()); // Added event listener
 
-    // Modal content handlers can be added here...
+    // Playlist modal controls
+    elements.savePlaylistBtn.addEventListener('click', Playlist.saveNewPlaylist); // Add listener for saving
 
     // Keyboard shortcut for marking next line
     document.addEventListener('keydown', (e) => {
