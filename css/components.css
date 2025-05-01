@@ -423,6 +423,40 @@
     border-radius: 4px;
 }
 
+/* Styles for extracted palette display */
+.extracted-palette {
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    min-height: 40px; 
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
+
+.extracted-palette-swatch {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%; 
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.extracted-palette-swatch:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+/* Make note visible when needed */
+.extracted-palette .note {
+    width: 100%;
+    text-align: center;
+    display: block !important; 
+    margin: 0;
+}
+
 #custom-font-input {
     width: 100%;
     background-color: rgba(0, 0, 0, 0.2);

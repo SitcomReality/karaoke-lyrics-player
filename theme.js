@@ -117,14 +117,15 @@ function extractColors(colorThief, imageElement) {
         // Get dominant color
         const dominantColor = colorThief.getColor(imageElement);
         // Get a palette
-        const palette = colorThief.getPalette(imageElement, 5); // Get 5 colors
+        const palette = colorThief.getPalette(imageElement, 8); // Get 8 colors for more choice
 
         // Convert RGB arrays to hex
         const primaryHex = rgbToHex(dominantColor[0], dominantColor[1], dominantColor[2]);
-
-        // Pick contrasting colors from the palette for other theme elements
-        // Prefer colors from palette, but have fallbacks
         const paletteHex = palette.map(rgb => rgbToHex(rgb[0], rgb[1], rgb[2]));
+
+        // --- Store the extracted palette in state ---
+        state.currentSong.extractedPalette = paletteHex;
+        // ---
 
         // Choose background: Ensure it's dark. Start with dominant, darken if needed.
         let backgroundHex = primaryHex;
@@ -171,7 +172,7 @@ function extractColors(colorThief, imageElement) {
              }
          }
 
-        // Update state
+        // Update state theme (palette is already updated)
         state.currentSong.theme = {
             primary: primaryActualHex,
             secondary: secondaryHex,
@@ -182,9 +183,10 @@ function extractColors(colorThief, imageElement) {
 
         // Apply the new theme
         updateThemeUI();
-        // Populate the color inputs in the modal if it's open
+        // Populate the color inputs AND the palette display in the modal if it's open
         if (elements.colorEditModal.style.display === 'block') {
              populateColorInputs();
+             updateExtractedPaletteDisplay(); // Call new function
         }
         Storage.saveCurrentSongState();
     } catch (error) {
@@ -193,6 +195,46 @@ function extractColors(colorThief, imageElement) {
          // Optionally revert to default colors or show an error message
          // state.currentSong.theme = { ...defaultTheme }; // Assuming defaultTheme exists
          // updateThemeUI();
+         // Clear extracted palette on error
+         state.currentSong.extractedPalette = [];
+         if (elements.colorEditModal.style.display === 'block') {
+             updateExtractedPaletteDisplay();
+         }
+    }
+}
+
+// --- New function to update the extracted palette display ---
+export function updateExtractedPaletteDisplay() {
+    const paletteDisplay = elements.extractedPaletteDisplay;
+    paletteDisplay.innerHTML = ''; // Clear previous swatches
+
+    const palette = state.currentSong.extractedPalette;
+
+    if (palette && palette.length > 0) {
+        palette.forEach(colorHex => {
+            const swatch = document.createElement('div');
+            swatch.className = 'extracted-palette-swatch';
+            swatch.style.backgroundColor = colorHex;
+            swatch.title = `Copy ${colorHex}`; // Add title for hover tooltip
+
+            // Add click to copy hex code
+            swatch.addEventListener('click', () => {
+                navigator.clipboard.writeText(colorHex).then(() => {
+                    // Optional: Show temporary feedback
+                    swatch.style.borderColor = 'var(--accent-color)';
+                    setTimeout(() => { swatch.style.borderColor = 'rgba(255, 255, 255, 0.3)'; }, 1000);
+                }).catch(err => {
+                    console.error('Failed to copy color:', err);
+                    // Fallback for older browsers or if permission denied
+                    alert(`Could not copy. Color: ${colorHex}`);
+                });
+            });
+
+            paletteDisplay.appendChild(swatch);
+        });
+    } else {
+        // Show placeholder text if no palette exists
+        paletteDisplay.innerHTML = '<p class="note">No colors extracted from image yet. Upload an image and click "Extract from Image".</p>';
     }
 }
 

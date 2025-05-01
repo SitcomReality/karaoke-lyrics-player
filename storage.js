@@ -24,10 +24,9 @@ export function saveCurrentSongState() {
             lyrics: state.currentSong.lyrics,
             timing: state.currentSong.timing,
             // Do not save image data URL or audio Object URL to localStorage
-            // image: state.currentSong.image, // Avoid storing large base64 strings
-            // audioUrl: state.currentSong.audioUrl, // Avoid storing object URLs
             theme: state.currentSong.theme,
             font: state.currentSong.font
+            // Exclude extractedPalette, as it's derived UI state
         };
         localStorage.setItem(CURRENT_SONG_KEY, JSON.stringify(serializableSong));
     } catch (e) {
@@ -47,7 +46,7 @@ export function saveHistory() {
             timing: song.timing,
             theme: song.theme,
             font: song.font
-            // Exclude image/audio data
+            // Exclude image/audio data and extractedPalette
         }));
         localStorage.setItem(HISTORY_KEY, JSON.stringify(serializableHistory));
     } catch (e) {
@@ -119,10 +118,11 @@ function loadCurrentSong() {
             const loadedSong = JSON.parse(currentSongData);
             // Merge loaded data with defaults to ensure all properties exist
              state.currentSong = {
-                ...state.currentSong, // Start with defaults
+                ...state.currentSong, // Start with defaults (including empty extractedPalette)
                 ...loadedSong, // Overwrite with loaded data
                 image: null, // Reset non-serializable fields
-                audioUrl: null // Reset non-serializable fields
+                audioUrl: null, // Reset non-serializable fields
+                extractedPalette: [] // Explicitly ensure palette is reset on load
             };
              // Ensure the loaded song has an ID
             if (!state.currentSong.id) {
@@ -138,6 +138,8 @@ function loadCurrentSong() {
         if (!state.currentSong.id) {
             state.currentSong.id = Date.now().toString();
         }
+        // Ensure palette is empty for a new/default song
+        state.currentSong.extractedPalette = [];
     }
 }
 

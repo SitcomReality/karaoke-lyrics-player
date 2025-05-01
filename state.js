@@ -19,7 +19,8 @@ export const state = {
             background: '#121212',
             text: '#e1e1e1'
         },
-        font: 'Roboto'
+        font: 'Roboto',
+        extractedPalette: [] // Add array to store extracted colors
     },
     isPlaying: false,
     currentTime: 0,
@@ -57,7 +58,8 @@ export function resetCurrentSong() {
             background: '#121212',
             text: '#e1e1e1'
         },
-        font: 'Roboto'
+        font: 'Roboto',
+        extractedPalette: [] // Reset extracted palette
     };
     if (state.audio) {
         state.audio.pause(); // Stop playback if any

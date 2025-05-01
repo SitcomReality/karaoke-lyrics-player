@@ -52,7 +52,7 @@ function generateExportJSON() {
         }, null, 2);
         return;
     }
-    
+
     // Create exportable version of current song
     const exportData = {
         title: state.currentSong.title,
@@ -61,8 +61,9 @@ function generateExportJSON() {
         timing: state.currentSong.timing,
         theme: state.currentSong.theme,
         font: state.currentSong.font
+        // Do not export extractedPalette
     };
-    
+
     elements.exportJson.value = JSON.stringify(exportData, null, 2);
 }
 
@@ -70,26 +71,26 @@ function importProject() {
     try {
         // Parse the JSON input
         const jsonData = JSON.parse(elements.importJson.value);
-        
+
         // Validate the imported data
         if (!jsonData.title && !jsonData.lyrics) {
             throw new Error("Invalid project data. Missing required fields.");
         }
-        
+
         // Reset current song to defaults first
         resetCurrentSong();
-        
+
         // Import data fields
         state.currentSong.title = jsonData.title || '';
         state.currentSong.artist = jsonData.artist || '';
         state.currentSong.lyrics = Array.isArray(jsonData.lyrics) ? jsonData.lyrics : [];
         state.currentSong.timing = Array.isArray(jsonData.timing) ? jsonData.timing : [];
-        
+
         // Ensure timing array matches lyrics length
         if (state.currentSong.timing.length !== state.currentSong.lyrics.length) {
             state.currentSong.timing = Array(state.currentSong.lyrics.length).fill(null);
         }
-        
+
         // Import theme if present
         if (jsonData.theme) {
             state.currentSong.theme = {
@@ -100,24 +101,27 @@ function importProject() {
                 text: jsonData.theme.text || '#e1e1e1'
             };
         }
-        
+
         // Import font if present
         if (jsonData.font) {
             state.currentSong.font = jsonData.font;
         }
         
+        // Ensure extractedPalette is reset (it's not imported)
+        state.currentSong.extractedPalette = [];
+
         // Save imported data
         Storage.saveCurrentSongState();
-        
+
         // Update UI
         UI.updateUI();
-        
+
         // Close the modal
         const modal = elements.importExportModal;
         if (modal) {
             modal.style.display = 'none';
         }
-        
+
         alert('Project imported successfully!');
     } catch (error) {
         alert(`Import failed: ${error.message}`);

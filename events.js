@@ -37,7 +37,7 @@ export function setupEventListeners() {
 
     // Modal buttons
     elements.importExportBtn.addEventListener('click', () => Modal.openModal(elements.importExportModal));
-    elements.editColorsBtn.addEventListener('click', handleOpenColorEditor); // Use specific handler
+    elements.editColorsBtn.addEventListener('click', handleOpenColorEditor); 
     elements.createPlaylistBtn.addEventListener('click', () => Modal.openModal(elements.createPlaylistModal));
 
     // Theme/Color editing modal handlers
@@ -52,9 +52,18 @@ export function setupEventListeners() {
 
     // Keyboard shortcut for marking next line
     document.addEventListener('keydown', (e) => {
-        if (e.code === 'Space' && !Modal.isAnyModalOpen()) {
-            e.preventDefault(); // Prevent page scroll
-            Lyrics.markNextLine();
+        // Check if the active element is an input or textarea to avoid interfering
+        const activeElement = document.activeElement;
+        const isInputActive = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA');
+
+        if (e.code === 'Space' && !Modal.isAnyModalOpen() && !isInputActive) {
+            e.preventDefault(); // Prevent page scroll or space in inputs
+            // Check if play/pause button is focused, if so, trigger click instead
+            if (activeElement === elements.playBtn) {
+                 elements.playBtn.click();
+            } else {
+                 Lyrics.markNextLine();
+            }
         }
     });
 }
@@ -95,6 +104,8 @@ function openLyricsEditor() {
 function handleOpenColorEditor() {
     // Populate inputs with current theme colors before opening
     Theme.populateColorInputs();
+    // Populate the extracted palette display
+    Theme.updateExtractedPaletteDisplay();
     Modal.openModal(elements.colorEditModal);
 }
 

@@ -76,6 +76,7 @@ export const elements = {
     textColorInput: document.getElementById('text-color-input'),
     applyColorsBtn: document.getElementById('apply-colors-btn'),
     extractColorsBtn: document.getElementById('extract-colors-btn'),
+    extractedPaletteDisplay: document.getElementById('extracted-palette-display'),
 
     // Font modal
     customFontInput: document.getElementById('custom-font-input'),
