@@ -9,24 +9,252 @@
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/lyrics.css">
     <link rel="stylesheet" href="css/responsive.css">
-    <link rel="stylesheet" href="css/presentation.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="app-container">
-        <!-- Left sidebar HTML will be injected here by ui/html/leftSidebar.js -->
-        <!-- Main content HTML will be injected here by ui/html/mainContent.js -->
-        <!-- Right sidebar HTML will be injected here by ui/html/rightSidebar.js -->
+        <!-- Left sidebar -->
+        <div class="sidebar left-sidebar">
+            <div class="sidebar-section">
+                <h3>History</h3>
+                <div id="history-panel" class="panel">
+                    <!-- History items will be populated here -->
+                    <p class="empty-message">No saved songs yet</p>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <h3>Playlists</h3>
+                <div id="playlists-panel" class="panel">
+                    <!-- Playlist items will be populated here -->
+                    <p class="empty-message">No playlists yet</p>
+                </div>
+                <button id="create-playlist" class="btn"><i class="fas fa-plus"></i> New Playlist</button>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="main-content">
+            <div class="header-section">
+                <div class="song-header">
+                    <div id="song-image-container">
+                        <img id="song-image" src="default-song-image.png" alt="Song Image">
+                    </div>
+                    <div class="song-info">
+                        <input type="text" id="song-title" placeholder="Song Title" class="editable-title">
+                        <input type="text" id="song-artist" placeholder="Artist Name" class="editable-title">
+                    </div>
+                </div>
+                <div class="upload-section">
+                    <span id="audio-file-info" class="file-info-display">No audio file loaded</span>
+                    <div class="upload-buttons">
+                        <label for="upload-audio" class="upload-btn">
+                            <i class="fas fa-music"></i> Upload Audio
+                        </label>
+                        <input type="file" id="upload-audio" accept="audio/*" class="file-input">
+
+                        <label for="upload-image" class="upload-btn">
+                            <i class="fas fa-image"></i> Upload Image
+                        </label>
+                        <input type="file" id="upload-image" accept="image/*" class="file-input">
+
+                        <button id="import-export-btn" class="upload-btn">
+                            <i class="fas fa-file-import"></i> Import/Export
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="player-section">
+                <div class="audio-player">
+                    <div class="controls">
+                        <button id="play-btn" class="control-btn"><i class="fas fa-play"></i></button>
+                        <div class="progress-container">
+                            <div id="progress-bar" class="progress-bar">
+                                <div id="progress" class="progress"></div>
+                            </div>
+                            <div id="time-display" class="time-display">0:00 / 0:00</div>
+                        </div>
+                        <div class="volume-control">
+                            <i class="fas fa-volume-up"></i>
+                            <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lyrics-section">
+                <div class="lyrics-placeholder" style="display: none;">
+                    <p>No lyrics loaded. Upload a lyrics file or click "Edit Lyrics" to add them manually.</p>
+                </div>
+                <div class="lyrics-container" id="lyrics-container">
+                    <!-- Lyrics lines will be populated here -->
+                </div>
+                <div class="lyrics-actions">
+                    <label for="upload-lyrics" class="upload-btn">
+                        <i class="fas fa-file-alt"></i> Upload Lyrics
+                    </label>
+                    <input type="file" id="upload-lyrics" accept=".txt,.lrc" class="file-input">
+                    
+                    <button id="edit-lyrics-btn" class="upload-btn">
+                        <i class="fas fa-edit"></i> Edit Lyrics
+                    </button>
+                </div>
+                <div class="timing-controls">
+                    <button id="next-line-btn" class="btn primary-btn">
+                        <i class="fas fa-arrow-right"></i> Next Line (Space)
+                    </button>
+                    <button id="reset-timing-btn" class="btn">
+                        <i class="fas fa-redo"></i> Reset Timing
+                    </button>
+                    <button id="edit-timing-mode-btn" class="btn">
+                        <i class="fas fa-edit"></i> Edit Timing
+                    </button>
+                    <button id="save-project-btn" class="btn primary-btn">
+                        <i class="fas fa-save"></i> Save Project
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right sidebar -->
+        <div class="sidebar right-sidebar">
+            <div class="sidebar-section">
+                <h3>Current Playlist</h3>
+                <div id="current-playlist-panel" class="panel">
+                    <!-- Current playlist will be populated here -->
+                    <p class="empty-message">No active playlist</p>
+                </div>
+                <div class="playlist-controls">
+                    <button id="prev-song-btn" class="btn" title="Previous Song"><i class="fas fa-step-backward"></i></button>
+                    <button id="add-new-song-btn" class="btn" title="New Song"><i class="fas fa-plus-circle"></i></button>
+                    <button id="next-song-btn" class="btn" title="Next Song"><i class="fas fa-step-forward"></i></button>
+                    <button id="toggle-auto-advance-btn" class="btn" title="Toggle Auto-Advance">
+                        <i class="fas fa-forward"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <h3>Theme Settings</h3>
+                <div id="theme-panel" class="panel">
+                    <div class="color-theme">
+                        <div class="theme-color primary" id="primary-color"></div>
+                        <div class="theme-color secondary" id="secondary-color"></div>
+                        <div class="theme-color accent" id="accent-color"></div>
+                        <div class="theme-color background" id="background-color"></div>
+                        <div class="theme-color text" id="text-color"></div>
+                    </div>
+                    <button id="edit-colors-btn" class="btn small-btn">Edit Colors</button>
+                    <div class="font-selection">
+                        <label for="font-selector">Font:</label>
+                        <select id="font-selector">
+                            <option value="Roboto">Roboto</option>
+                            <option value="Open Sans">Open Sans</option>
+                            <option value="Lato">Lato</option>
+                            <option value="Montserrat">Montserrat</option>
+                            <option value="custom">Custom...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Modals HTML will be injected here (typically at the end of body) by ui/html/modals.js -->
+    <!-- Modals -->
+    <div id="import-export-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Import/Export Project</h2>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="import">Import</button>
+                <button class="tab-btn" data-tab="export">Export</button>
+            </div>
+            <div class="tab-content" id="import-tab">
+                <p>Paste the project data JSON below:</p>
+                <textarea id="import-json" rows="10"></textarea>
+                <button id="import-btn" class="btn primary-btn">Import</button>
+            </div>
+            <div class="tab-content" id="export-tab" style="display: none;">
+                <p>Copy the project data JSON:</p>
+                <textarea id="export-json" rows="10" readonly></textarea>
+                <button id="copy-json-btn" class="btn primary-btn">Copy to Clipboard</button>
+            </div>
+        </div>
+    </div>
 
-    <!-- Tombstone comments for removed content -->
-    <!-- Removed Left Sidebar HTML structure. Now generated by ui/html/leftSidebar.js -->
-    <!-- Removed Main Content HTML structure. Now generated by ui/html/mainContent.js -->
-    <!-- Removed Right Sidebar HTML structure. Now generated by ui/html/rightSidebar.js -->
-    <!-- Removed All Modals HTML structure. Now generated by ui/html/modals.js -->
+    <div id="color-edit-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Theme Colors</h2>
+            <div id="extracted-palette-display" class="extracted-palette">
+                <p class="note" style="display: none;">No colors extracted from image yet.</p>
+            </div>
+            <button id="apply-extracted-theme-btn" class="btn small-btn" title="Apply theme based on extracted colors (click again to cycle)">
+                <i class="fas fa-palette"></i> Use Extracted Colors
+            </button>
+            <div class="color-inputs">
+                <div class="color-input">
+                    <label>Primary Color:</label>
+                    <input type="color" id="primary-color-input">
+                </div>
+                <div class="color-input">
+                    <label>Secondary Color:</label>
+                    <input type="color" id="secondary-color-input">
+                </div>
+                <div class="color-input">
+                    <label>Accent Color:</label>
+                    <input type="color" id="accent-color-input">
+                </div>
+                <div class="color-input">
+                    <label>Background Color:</label>
+                    <input type="color" id="background-color-input">
+                </div>
+                <div class="color-input">
+                    <label>Text Color:</label>
+                    <input type="color" id="text-color-input">
+                </div>
+            </div>
+            <button id="apply-colors-btn" class="btn primary-btn">Apply Colors</button>
+            <button id="extract-colors-btn" class="btn">Extract from Image</button>
+        </div>
+    </div>
+
+    <div id="custom-font-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Custom Font</h2>
+            <p>Enter a Google Font name:</p>
+            <input type="text" id="custom-font-input" placeholder="e.g. Pacifico">
+            <p class="note">The font must be available on Google Fonts</p>
+            <button id="apply-font-btn" class="btn primary-btn">Apply Font</button>
+        </div>
+    </div>
+
+    <div id="create-playlist-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Create New Playlist</h2>
+            <input type="text" id="playlist-name-input" placeholder="Playlist Name">
+            <div class="available-songs">
+                <h3>Available Songs</h3>
+                <div id="available-songs-list" class="checklist"></div>
+            </div>
+            <button id="save-playlist-btn" class="btn primary-btn">Save Playlist</button>
+        </div>
+    </div>
+
+    <div id="lyrics-editor-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Lyrics</h2>
+            <p class="note">Enter each line of lyrics on a separate line.</p>
+            <textarea id="lyrics-editor" rows="20" placeholder="Enter lyrics here..."></textarea>
+            <div class="modal-actions">
+                <button id="save-lyrics-btn" class="btn primary-btn">Save Lyrics</button>
+                <button id="cancel-lyrics-btn" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Import map for modern JS imports -->
     <script type="importmap">
