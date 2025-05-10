@@ -1,7 +1,7 @@
 // UI Update functions
 import { state, getCurrentPlaylist } from '../state.js';
 import { elements } from '../dom.js';
-import * as Theme from '../theme.js';
+import * as Theme from '../theme/index.js'; 
 import * as Lyrics from '../lyrics.js';
 import * as Audio from '../audio.js';
 

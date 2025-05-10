@@ -4,7 +4,7 @@ import * as Audio from './audio.js';
 import * as Lyrics from './lyrics.js';
 import * as Storage from './storage.js';
 import * as UI from './ui/index.js';
-import * as Theme from './theme.js';
+import * as Theme from './theme/index.js';
 import * as Playlist from './playlist.js';
 import * as Modal from './modal.js';
 import * as ImportExport from './importExport.js';

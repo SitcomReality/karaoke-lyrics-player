@@ -1,12 +1,13 @@
-// theme.js - Manages theme application, state, and UI updates related to theme
-import { state } from './state.js';
-import { elements } from './dom.js';
-import * as Storage from './storage.js';
-import * as ColorUtils from './colorUtils.js';
-import { applyFont } from './fontLoader.js'; // Import only necessary function
+// theme/generator.js - Logic for generating themes from extracted palettes
+import { state } from '../state.js';
+import { elements } from '../dom.js';
+import * as ColorUtils from '../colorUtils.js';
 
 // Module-level variable to track theme variation for extracted colors
 let themeVariationIndex = 0;
+
+/** Minimum required difference between primary, secondary, and accent colors */
+const MIN_COLOR_DIFF = 50;
 
 /**
  * Resets the rotation offset for applying extracted themes.
@@ -15,143 +16,6 @@ let themeVariationIndex = 0;
 export function resetThemeRotationOffset() {
     themeVariationIndex = 0;
 }
-
-/**
- * Updates the theme preview UI elements and applies the theme and font.
- */
-export function updateThemeUI() {
-    // Update theme color previews in the sidebar
-    elements.primaryColor.style.backgroundColor = state.currentSong.theme.primary;
-    elements.secondaryColor.style.backgroundColor = state.currentSong.theme.secondary;
-    elements.accentColor.style.backgroundColor = state.currentSong.theme.accent;
-    elements.backgroundColor.style.backgroundColor = state.currentSong.theme.background;
-    elements.textColor.style.backgroundColor = state.currentSong.theme.text; // This preview shows the "--on-background" color
-
-    // Apply theme colors to CSS variables
-    applyTheme(state.currentSong.theme);
-
-    // Update font selector dropdown and apply the font
-    updateFontSelector();
-    if (state.currentSong.font) {
-        applyFont(state.currentSong.font);
-    } else {
-        applyFont('Roboto'); // Apply default if none is set
-    }
-}
-
-/**
- * Converts a hex color to its RGB components string (e.g., "255, 0, 128").
- * @param {string} hex - Hex color string.
- * @returns {string} RGB component string or default if invalid.
- */
-function hexToRgbString(hex) {
-    const rgb = ColorUtils.hexToRgb(hex);
-    if (!rgb) return '255, 255, 255'; // Default to white components if conversion fails
-    return `${rgb.r}, ${rgb.g}, ${rgb.b}`;
-}
-
-/**
- * Applies the given theme object to the document's CSS variables.
- * @param {object} theme - The theme object with color properties.
- */
-export function applyTheme(theme) {
-    elements.root.style.setProperty('--primary-color', theme.primary);
-    elements.root.style.setProperty('--secondary-color', theme.secondary);
-    elements.root.style.setProperty('--accent-color', theme.accent);
-    elements.root.style.setProperty('--background-color', theme.background);
-    elements.root.style.setProperty('--on-background', theme.text);
-    elements.root.style.setProperty('--on-surface', theme.text); // Use same text color for surface by default
-
-    // Derive surface color from background
-    const currentBgRgb = ColorUtils.hexToRgb(theme.background);
-    let surfaceColorHex;
-    if (currentBgRgb) {
-        const brightness = ColorUtils.calculateBrightness(currentBgRgb);
-        // Adjust brightness slightly based on how dark the background is
-        // Increase brightness slightly for dark backgrounds, decrease for light ones
-        const adjustment = brightness < 128 ? 5 : -3;
-        surfaceColorHex = ColorUtils.adjustBrightness(theme.background, adjustment);
-    } else {
-        surfaceColorHex = ColorUtils.adjustBrightness(theme.background, 5); // Fallback adjustment
-    }
-    elements.root.style.setProperty('--surface-color', surfaceColorHex);
-
-    // Set contrast colors based on the main colors
-    const onPrimary = ColorUtils.getContrastColor(theme.primary);
-    const onSecondary = ColorUtils.getContrastColor(theme.secondary);
-    // For surface, derive contrast from the *calculated* surface color
-    const onSurface = ColorUtils.getContrastColor(surfaceColorHex);
-    const onError = ColorUtils.getContrastColor(elements.root.style.getPropertyValue('--error-color') || '#cf6679'); // Use existing or default error color
-
-    elements.root.style.setProperty('--on-primary', onPrimary);
-    elements.root.style.setProperty('--on-secondary', onSecondary);
-    elements.root.style.setProperty('--on-surface', onSurface); // Override default text color if needed for surface contrast
-    elements.root.style.setProperty('--on-error', onError);
-
-    // Set RGB versions of all colors for rgba() usage
-    elements.root.style.setProperty('--rgb-primary', hexToRgbString(theme.primary));
-    elements.root.style.setProperty('--rgb-secondary', hexToRgbString(theme.secondary));
-    elements.root.style.setProperty('--rgb-accent', hexToRgbString(theme.accent));
-    elements.root.style.setProperty('--rgb-background', hexToRgbString(theme.background));
-    elements.root.style.setProperty('--rgb-surface', hexToRgbString(surfaceColorHex));
-    elements.root.style.setProperty('--rgb-error', hexToRgbString(elements.root.style.getPropertyValue('--error-color') || '#cf6679'));
-
-    elements.root.style.setProperty('--rgb-on-primary', hexToRgbString(onPrimary));
-    elements.root.style.setProperty('--rgb-on-secondary', hexToRgbString(onSecondary));
-    elements.root.style.setProperty('--rgb-on-background', hexToRgbString(theme.text));
-    elements.root.style.setProperty('--rgb-on-surface', hexToRgbString(onSurface));
-    elements.root.style.setProperty('--rgb-on-error', hexToRgbString(onError));
-}
-
-/**
- * Updates the font selector dropdown based on the current song's font.
- * Adds the current font to the list if it's custom and not already present.
- */
-function updateFontSelector() {
-    const currentFont = state.currentSong.font;
-    const standardFonts = ['Roboto', 'Open Sans', 'Lato', 'Montserrat', 'custom'];
-
-    // Add the current font to the list if it's custom and not already present
-    if (currentFont && !standardFonts.includes(currentFont)) {
-        let optionExists = false;
-        for (let i = 0; i < elements.fontSelector.options.length; i++) {
-            if (elements.fontSelector.options[i].value === currentFont) {
-                optionExists = true;
-                break;
-            }
-        }
-        if (!optionExists) {
-            const option = document.createElement('option');
-            option.value = currentFont;
-            option.textContent = currentFont;
-            // Insert before the 'custom' option
-            const customOption = elements.fontSelector.querySelector('option[value="custom"]');
-            if (customOption) {
-                 elements.fontSelector.insertBefore(option, customOption);
-            } else {
-                elements.fontSelector.appendChild(option); // Fallback if 'custom' not found
-            }
-        }
-    }
-    // Set the selected value
-    elements.fontSelector.value = currentFont || 'Roboto'; // Default to Roboto if no font is set
-}
-
-/**
- * Populates the color input fields in the color edit modal with the current theme colors.
- */
-export function populateColorInputs() {
-    elements.primaryColorInput.value = state.currentSong.theme.primary;
-    elements.secondaryColorInput.value = state.currentSong.theme.secondary;
-    elements.accentColorInput.value = state.currentSong.theme.accent;
-    elements.backgroundColorInput.value = state.currentSong.theme.background;
-    elements.textColorInput.value = state.currentSong.theme.text;
-}
-
-// --- Theme Generation Strategies ---
-
-/** Minimum required difference between primary, secondary, and accent colors */
-const MIN_COLOR_DIFF = 50;
 
 /**
  * Generates fallback colors based on a background color.

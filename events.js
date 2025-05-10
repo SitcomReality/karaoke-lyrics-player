@@ -5,7 +5,7 @@ import * as Audio from './audio.js';
 import * as UI from './ui.js';
 import * as Lyrics from './lyrics.js';
 import * as Storage from './storage.js';
-import * as Theme from './theme.js';
+import * as Theme from './theme/index.js'; 
 import * as Modal from './modal.js';
 // import * as ImportExport from './importExport.js'; // Not used in this file currently
 import { extractColorsFromImage } from './colorExtractor.js'; 
