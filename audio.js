@@ -5,6 +5,7 @@ import * as UI from './ui/index.js';
 import * as Playlist from './playlist.js';
 import * as Lyrics from './lyrics.js';
 import * as Storage from './storage.js';
+import * as Presentation from './presentation/index.js';
 
 export function setupInitialAudio() {
     if (state.currentSong && state.currentSong.audioUrl) {
@@ -51,6 +52,38 @@ export function setupAudioListeners() {
     });
 
     state.audio.volume = parseFloat(elements.volumeSlider.value);
+
+    // Set up audio analysis for visualization if Web Audio API is supported
+    try {
+        if (!state.audioContext) {
+            state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        // Connect audio to analyzer
+        const source = state.audioContext.createMediaElementSource(state.audio);
+        const analyser = state.audioContext.createAnalyser();
+        
+        source.connect(analyser);
+        analyser.connect(state.audioContext.destination);
+        
+        // Configure analyzer
+        analyser.fftSize = 256;
+        
+        // Store analyzer for visualization
+        state.audioAnalyser = analyser;
+        
+        // Start visualizer if in presentation mode
+        if (state.presentation && state.presentation.active) {
+            const visualizerCanvas = document.querySelector('.audio-visualizer');
+            if (visualizerCanvas) {
+                import('./presentation/animations.js').then(module => {
+                    module.startVisualizer(visualizerCanvas, state.audioContext, analyser);
+                });
+            }
+        }
+    } catch (e) {
+        console.warn('Web Audio API not supported for visualization:', e);
+    }
 }
 
 export function togglePlay() {

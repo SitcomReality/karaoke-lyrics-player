@@ -9,12 +9,13 @@ import * as Playlist from './playlist.js';
 import * as Modal from './modal.js';
 import * as ImportExport from './importExport.js';
 import * as Events from './events.js';
+import * as Presentation from './presentation/index.js';
 
 // Initialize application
 function init() {
     // Load data from local storage
     Storage.loadFromLocalStorage();
-
+    
     // Set up event listeners
     Events.setupEventListeners();
     
@@ -26,6 +27,9 @@ function init() {
 
     // Set up initial audio state if necessary
     Audio.setupInitialAudio();
+    
+    // Initialize presentation mode
+    Presentation.init();
 }
 
 // Entry point

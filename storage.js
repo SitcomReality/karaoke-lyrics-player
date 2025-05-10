@@ -76,6 +76,21 @@ export function saveCurrentPlaylistInfo() {
     }
 }
 
+export function savePresentationSettings() {
+  // Only save the necessary, serializable parts
+  const serializedSettings = {
+    animationType: state.presentation.animationType,
+    showHeader: state.presentation.showHeader,
+    webcam: { ...state.presentation.webcam }
+  };
+  
+  try {
+    localStorage.setItem('karaoke_presentation_settings', JSON.stringify(serializedSettings));
+  } catch (e) {
+    console.error("Error saving presentation settings:", e);
+  }
+}
+
 // --- Loading ---
 
 export function loadFromLocalStorage() {
@@ -83,6 +98,7 @@ export function loadFromLocalStorage() {
     loadPlaylists();
     loadCurrentSong();
     loadCurrentPlaylistInfo();
+    loadPresentationSettings();
 }
 
 function loadHistory() {
@@ -171,6 +187,30 @@ function loadCurrentPlaylistInfo() {
         // If no saved playlist info, ensure autoAdvance is default
         state.autoAdvanceEnabled = true;
     }
+}
+
+function loadPresentationSettings() {
+  try {
+    const savedSettings = localStorage.getItem('karaoke_presentation_settings');
+    if (savedSettings) {
+      const parsedSettings = JSON.parse(savedSettings);
+      
+      // Apply loaded settings to current state
+      if (state.presentation) {
+        state.presentation = {
+          ...state.presentation,
+          ...parsedSettings
+        };
+      } else {
+        state.presentation = {
+          active: false,
+          ...parsedSettings
+        };
+      }
+    }
+  } catch (e) {
+    console.error("Error loading presentation settings:", e);
+  }
 }
 
 // --- Project Saving (Adding/Updating History) ---

@@ -1,0 +1,321 @@
+/* Presentation Mode Styles */
+body.presentation-mode .app-container {
+  flex-direction: column;
+  background-color: var(--background-color);
+}
+
+body.presentation-mode .sidebar,
+body.presentation-mode .header-section,
+body.presentation-mode .lyrics-actions,
+body.presentation-mode .timing-controls {
+  display: none;
+}
+
+body.presentation-mode .main-content {
+  width: 100%;
+  height: 100vh;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header Image Container */
+.presentation-header {
+  width: 100%;
+  height: 0;
+  padding-bottom: 42%; /* Aspect ratio for 1356x768 is roughly 16:9 */
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.3);
+  margin-bottom: 0;
+  transition: height 0.3s ease;
+}
+
+.presentation-header img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.presentation-header .song-info-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 1rem 2rem;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.presentation-header .song-info-overlay h1 {
+  font-size: 2.5rem;
+  margin: 0;
+  font-weight: 700;
+}
+
+.presentation-header .song-info-overlay h2 {
+  font-size: 1.5rem;
+  margin: 0.5rem 0 0;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+/* Lyrics Display */
+body.presentation-mode .lyrics-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+body.presentation-mode .lyrics-container {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+body.presentation-mode .lyrics-line {
+  font-size: 2.5rem;
+  line-height: 1.3;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  margin: 0.5rem 0;
+  border-radius: 8px;
+  max-width: 90%;
+  transition: all 0.3s ease;
+  opacity: 0.5;
+}
+
+body.presentation-mode .lyrics-line.active {
+  font-size: 3rem;
+  opacity: 1;
+  background-color: rgba(var(--rgb-primary), 0.2);
+  color: var(--accent-color);
+  box-shadow: 0 4px 20px rgba(var(--rgb-accent), 0.3);
+}
+
+body.presentation-mode .lyrics-line .line-time {
+  display: none;
+}
+
+/* Minimalistic Player Section */
+body.presentation-mode .player-section {
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 0;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  opacity: 0.3;
+  transition: opacity 0.3s ease;
+}
+
+body.presentation-mode .player-section:hover {
+  opacity: 1;
+}
+
+body.presentation-mode .progress-container {
+  margin: 0 1rem;
+}
+
+/* Webcam Space Reservation */
+.webcam-space {
+  position: absolute;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.9rem;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.webcam-space.top-left {
+  top: 1rem;
+  left: 1rem;
+}
+
+.webcam-space.top-right {
+  top: 1rem;
+  right: 1rem;
+}
+
+.webcam-space.bottom-left {
+  bottom: 4rem; /* Above player controls */
+  left: 1rem;
+}
+
+.webcam-space.bottom-right {
+  bottom: 4rem; /* Above player controls */
+  right: 1rem;
+}
+
+/* Animation Base Styles */
+body.presentation-mode .animation-fade .lyrics-line {
+  transition: opacity 0.5s ease, transform 0.5s ease, background-color 0.5s ease, color 0.5s ease;
+}
+
+body.presentation-mode .animation-slide .lyrics-line {
+  transition: transform 0.5s ease, opacity 0.5s ease;
+  transform: translateX(50px);
+  opacity: 0;
+}
+
+body.presentation-mode .animation-slide .lyrics-line.active {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+body.presentation-mode .animation-slide .lyrics-line.past {
+  transform: translateX(-50px);
+  opacity: 0;
+}
+
+/* Mode Toggle Button */
+.mode-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 100;
+  background-color: var(--primary-color);
+  color: var(--on-primary);
+  border: none;
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.mode-toggle:hover {
+  background-color: var(--secondary-color);
+  transform: scale(1.05);
+}
+
+/* Settings Panel */
+.presentation-settings {
+  position: fixed;
+  top: 5rem;
+  right: 1rem;
+  z-index: 99;
+  background-color: var(--surface-color);
+  color: var(--on-surface);
+  border-radius: 8px;
+  padding: 1rem;
+  width: 300px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transform: translateX(120%);
+  transition: transform 0.3s ease;
+}
+
+.presentation-settings.visible {
+  transform: translateX(0);
+}
+
+.presentation-settings h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.settings-row {
+  margin-bottom: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.settings-row label {
+  flex: 1;
+}
+
+.settings-row select,
+.settings-row input {
+  flex: 1;
+  background-color: rgba(var(--rgb-on-surface), 0.1);
+  color: var(--on-surface);
+  border: 1px solid rgba(var(--rgb-on-surface), 0.2);
+  border-radius: 4px;
+  padding: 0.5rem;
+}
+
+.webcam-controls {
+  margin-top: 1rem;
+}
+
+.close-settings {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--on-surface);
+  cursor: pointer;
+  font-size: 1.2rem;
+  opacity: 0.7;
+}
+
+.close-settings:hover {
+  opacity: 1;
+}
+
+/* Animation Type Selector */
+.animation-selector {
+  margin-top: 1rem;
+}
+
+/* Visualizer */
+.audio-visualizer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  opacity: 0.2;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  body.presentation-mode .lyrics-line {
+    font-size: 2rem;
+  }
+  
+  body.presentation-mode .lyrics-line.active {
+    font-size: 2.5rem;
+  }
+  
+  .presentation-header .song-info-overlay h1 {
+    font-size: 1.8rem;
+  }
+  
+  .presentation-header .song-info-overlay h2 {
+    font-size: 1.2rem;
+  }
+  
+  .webcam-space {
+    width: 150px !important;
+    height: 100px !important;
+  }
+}

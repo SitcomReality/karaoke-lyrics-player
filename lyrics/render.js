@@ -1,6 +1,7 @@
 // lyrics/render.js - Rendering UI for lyrics and scroll logic
 import { state } from '../state.js';
 import { elements } from '../dom.js';
+import * as Presentation from '../presentation/index.js';
 
 /**
  * Renders all lyrics to the page, displaying timestamps if present.
@@ -56,6 +57,11 @@ export function renderLyrics() {
         });
 
         scrollToActiveLine();
+        
+        // Notify presentation mode about lyrics update
+        if (state.presentation && state.presentation.active) {
+            Presentation.updateLyricsDisplay();
+        }
     } else {
         elements.lyricsPlaceholder.style.display = 'flex';
         elements.lyricsContainer.style.display = 'none';

@@ -1,91 +1,110 @@
 // Application state management
 
 export const state = {
-    audio: null,
-    audioContext: null,
-    currentSong: {
-        id: null, // Unique ID for the song
-        title: '',
-        artist: '',
-        lyrics: [],
-        timing: [],
-        image: null, // Should store image URL or reference, not base64 if possible
-        audioUrl: null, // Store URL for audio file if loaded via ObjectURL
-        audioFilename: null, // Store the original filename of the uploaded audio
-        theme: {
-            primary: '#6200ea',
-            secondary: '#3700b3',
-            accent: '#03dac6',
-            background: '#121212',
-            text: '#e1e1e1'
-        },
-        font: 'Roboto',
-        extractedPalette: [] // Add array to store extracted colors
+  audio: null,
+  audioContext: null,
+  currentSong: {
+    id: null, // Unique ID for the song
+    title: '',
+    artist: '',
+    lyrics: [],
+    timing: [],
+    image: null, // Should store image URL or reference, not base64 if possible
+    audioUrl: null, // Store URL for audio file if loaded via ObjectURL
+    audioFilename: null, // Store the original filename of the uploaded audio
+    theme: {
+      primary: '#6200ea',
+      secondary: '#3700b3',
+      accent: '#03dac6',
+      background: '#121212',
+      text: '#e1e1e1'
     },
-    isPlaying: false,
-    currentTime: 0,
-    duration: 0,
-    currentLineIndex: -1,
-    editMode: false,
-    playlists: [], // Array of playlist objects { id, name, songs: [songId1, songId2] }
-    currentPlaylistId: null,
-    currentPlaylistIndex: -1, // Index within the current playlist
-    autoAdvanceEnabled: true, // New state for auto-advance
-    history: [], // Array of song objects (or song IDs)
-    editingPlaylistId: null, // ID of the playlist currently being edited
+    font: 'Roboto',
+    extractedPalette: [], // Add array to store extracted colors
+    animationPreferences: {
+      type: 'fade', // Default animation type
+      lineStyles: {} // Optional per-line custom styles
+    }
+  },
+  isPlaying: false,
+  currentTime: 0,
+  duration: 0,
+  currentLineIndex: -1,
+  editMode: false,
+  playlists: [], // Array of playlist objects { id, name, songs: [songId1, songId2] }
+  currentPlaylistId: null,
+  currentPlaylistIndex: -1, // Index within the current playlist
+  autoAdvanceEnabled: true, // New state for auto-advance
+  history: [], // Array of song objects (or song IDs)
+  editingPlaylistId: null, // ID of the playlist currently being edited
+  presentation: {
+    active: false,
+    animationType: 'fade', // Default animation
+    showHeader: true,
+    webcam: {
+      enabled: false,
+      position: 'bottom-right',
+      width: 320,
+      height: 240
+    }
+  }
 };
 
 export function resetCurrentSong() {
-    // Revoke URLs if they exist before resetting
-    if (state.currentSong.audioUrl) {
-        URL.revokeObjectURL(state.currentSong.audioUrl);
-    }
-    if (state.currentSong.image && state.currentSong.image.startsWith('blob:')) {
-        URL.revokeObjectURL(state.currentSong.image);
-    }
+  // Revoke URLs if they exist before resetting
+  if (state.currentSong.audioUrl) {
+    URL.revokeObjectURL(state.currentSong.audioUrl);
+  }
+  if (state.currentSong.image && state.currentSong.image.startsWith('blob:')) {
+    URL.revokeObjectURL(state.currentSong.image);
+  }
 
-    state.currentSong = {
-        id: Date.now().toString(), // Assign a unique ID when resetting
-        title: '',
-        artist: '',
-        lyrics: [],
-        timing: [],
-        image: null,
-        audioUrl: null,
-        audioFilename: null, // Reset filename
-        theme: {
-            primary: '#6200ea',
-            secondary: '#3700b3',
-            accent: '#03dac6',
-            background: '#121212',
-            text: '#e1e1e1'
-        },
-        font: 'Roboto',
-        extractedPalette: [] // Reset extracted palette
-    };
-    if (state.audio) {
-        state.audio.pause(); // Stop playback if any
+  state.currentSong = {
+    id: Date.now().toString(), // Assign a unique ID when resetting
+    title: '',
+    artist: '',
+    lyrics: [],
+    timing: [],
+    image: null,
+    audioUrl: null,
+    audioFilename: null, // Reset filename
+    theme: {
+      primary: '#6200ea',
+      secondary: '#3700b3',
+      accent: '#03dac6',
+      background: '#121212',
+      text: '#e1e1e1'
+    },
+    font: 'Roboto',
+    extractedPalette: [], // Reset extracted palette
+    animationPreferences: {
+      type: 'fade', // Default animation type
+      lineStyles: {} // Optional per-line custom styles
     }
-    state.audio = null;
-    state.isPlaying = false;
-    state.currentTime = 0;
-    state.duration = 0;
-    state.currentLineIndex = -1;
-    state.editMode = false;
+  };
+  if (state.audio) {
+    state.audio.pause(); // Stop playback if any
+  }
+  state.audio = null;
+  state.isPlaying = false;
+  state.currentTime = 0;
+  state.duration = 0;
+  state.currentLineIndex = -1;
+  state.editMode = false;
 }
 
 export function getCurrentSong() {
-    return state.currentSong;
+  return state.currentSong;
 }
 
 export function getHistory() {
-    return state.history;
+  return state.history;
 }
 
 export function getPlaylists() {
-    return state.playlists;
+  return state.playlists;
 }
 
 export function getCurrentPlaylist() {
-    return state.playlists.find(p => p.id === state.currentPlaylistId) || null;
+  return state.playlists.find(p => p.id === state.currentPlaylistId) || null;
 }
