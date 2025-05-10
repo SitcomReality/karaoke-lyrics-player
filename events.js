@@ -54,6 +54,7 @@ export function setupEventListeners() {
     // Playlist controls
     elements.prevSongBtn.addEventListener('click', () => Playlist.playPreviousSong()); // Added event listener
     elements.nextSongBtn.addEventListener('click', () => Playlist.playNextSong()); // Added event listener
+    elements.addNewSongBtn.addEventListener('click', Playlist.createNewSong); // Added event listener for new song button
 
     // Playlist modal controls
     elements.savePlaylistBtn.addEventListener('click', Playlist.saveNewPlaylist); // Add listener for saving

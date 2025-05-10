@@ -33,6 +33,7 @@ export const elements = {
     // Playlist controls
     prevSongBtn: document.getElementById('prev-song-btn'),
     nextSongBtn: document.getElementById('next-song-btn'),
+    addNewSongBtn: document.getElementById('add-new-song-btn'),
 
     // Panels
     historyPanel: document.getElementById('history-panel'),

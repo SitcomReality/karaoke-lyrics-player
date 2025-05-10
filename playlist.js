@@ -1,5 +1,5 @@
 // Playlist management functions
-import { state } from './state.js';
+import { state, resetCurrentSong } from './state.js';
 import { elements } from './dom.js'; // Need DOM elements
 import * as UI from './ui.js';
 import * as Storage from './storage.js';
@@ -163,4 +163,39 @@ export function saveNewPlaylist() {
     // Storage.saveCurrentPlaylistInfo();
     // UI.updateCurrentPlaylistPanel();
     // if (newPlaylist.songs.length > 0) loadSongFromPlaylist(0);
+}
+
+/**
+ * Handles the creation of a new song project.
+ * If the current song has content, it attempts to save it first.
+ * Then, resets the application to a new, blank song state.
+ */
+export function createNewSong() {
+    const songIsNotEmpty = state.currentSong.title || 
+                           state.currentSong.artist || 
+                           (state.currentSong.lyrics && state.currentSong.lyrics.length > 0) ||
+                           state.currentSong.audioFilename; // Consider audio as content too
+
+    if (songIsNotEmpty) {
+        // Attempt to save the current song.
+        // Storage.saveProject() will alert if title/artist are missing and are required for saving.
+        // If saveProject determines the song can be saved (or user provides missing info), it returns true.
+        const savedSuccessfully = Storage.saveProject();
+        
+        if (savedSuccessfully) {
+            // If saved successfully, then reset to a new song state.
+            resetCurrentSong();
+            UI.updateUI(); // Update all UI elements to reflect the new state
+        } else {
+            // Save was not successful (e.g., validation failed within saveProject, or user cancelled when prompted for info).
+            // In this case, do not proceed to reset. The user needs to resolve the save issue or explicitly clear.
+            console.log("Current song not saved or save was cancelled. New song creation aborted.");
+            // Optionally, you could offer a "Discard changes and create new song?" confirmation here
+            // but for now, it's a strict save-first (if content exists) policy.
+        }
+    } else {
+        // Current song is already effectively empty or considered new, so just reset.
+        resetCurrentSong();
+        UI.updateUI(); // Update all UI elements
+    }
 }
