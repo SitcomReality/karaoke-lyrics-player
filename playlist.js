@@ -1,9 +1,9 @@
 // Playlist management functions
-import { state, resetCurrentSong } from './state.js';
-import { elements } from './dom.js'; // Need DOM elements
+import { state, resetCurrentSong, getCurrentPlaylist } from './state.js'; 
+import { elements } from './dom.js'; 
 import * as UI from './ui.js';
 import * as Storage from './storage.js';
-import * as Modal from './modal.js'; // Need Modal functions
+import * as Modal from './modal.js'; 
 
 export function loadSongFromHistory(index) {
     if (index < 0 || index >= state.history.length) return;
@@ -13,20 +13,30 @@ export function loadSongFromHistory(index) {
     
     // Update current song with history data
     state.currentSong = {
-        ...state.currentSong, // Keep current non-serializable data like image/audioUrl
+        ...state.currentSong, 
         id: historySong.id,
         title: historySong.title,
         artist: historySong.artist,
         lyrics: [...historySong.lyrics],
         timing: [...historySong.timing],
         theme: { ...historySong.theme },
-        font: historySong.font
+        font: historySong.font,
+        audioUrl: state.currentSong.id === historySong.id ? state.currentSong.audioUrl : null,
+        image: state.currentSong.id === historySong.id ? state.currentSong.image : null,
+        audioFilename: state.currentSong.id === historySong.id ? state.currentSong.audioFilename : null,
     };
     
     // Reset playback state
     if (state.audio) {
         state.audio.pause();
         state.isPlaying = false;
+        if (state.currentSong.audioUrl) {
+            if (state.currentSong.id !== historySong.id) {
+                URL.revokeObjectURL(state.currentSong.audioUrl); 
+                state.currentSong.audioUrl = null;
+                state.currentSong.audioFilename = null;
+            }
+        }
     }
     state.currentTime = 0;
     state.currentLineIndex = -1;
@@ -41,7 +51,7 @@ export function loadSongFromHistory(index) {
 export function playNextSong() {
     if (!state.currentPlaylistId) return;
     
-    const playlist = state.playlists.find(p => p.id === state.currentPlaylistId);
+    const playlist = getCurrentPlaylist(); 
     if (!playlist || playlist.songs.length === 0) return;
     
     // Calculate next index, wrapping around if needed
@@ -53,7 +63,7 @@ export function playNextSong() {
 export function playPreviousSong() {
     if (!state.currentPlaylistId) return;
     
-    const playlist = state.playlists.find(p => p.id === state.currentPlaylistId);
+    const playlist = getCurrentPlaylist(); 
     if (!playlist || playlist.songs.length === 0) return;
     
     // Calculate previous index, wrapping around if needed
@@ -65,7 +75,7 @@ export function playPreviousSong() {
 export function loadSongFromPlaylist(index) {
     if (!state.currentPlaylistId) return;
     
-    const playlist = state.playlists.find(p => p.id === state.currentPlaylistId);
+    const playlist = getCurrentPlaylist(); 
     if (!playlist || index < 0 || index >= playlist.songs.length) return;
     
     // Update current index
@@ -78,14 +88,12 @@ export function loadSongFromPlaylist(index) {
     const historySong = state.history.find(s => s.id === songId);
     if (!historySong) {
         console.error("Song not found in history:", songId);
+        UI.updateCurrentPlaylistPanel(); 
         return;
     }
     
     // Load the song using the same method as loading from history
     loadSongFromHistory(state.history.indexOf(historySong));
-    
-    // Update playlist UI to show current song
-    UI.updateCurrentPlaylistPanel();
     
     // Save current playlist info
     Storage.saveCurrentPlaylistInfo();
@@ -98,7 +106,7 @@ export function loadSongFromPlaylist(index) {
  */
 export function openCreatePlaylistModal() {
     populateAvailableSongsList();
-    elements.playlistNameInput.value = ''; // Clear previous name
+    elements.playlistNameInput.value = ''; 
     Modal.openModal(elements.createPlaylistModal);
 }
 
@@ -107,7 +115,7 @@ export function openCreatePlaylistModal() {
  */
 function populateAvailableSongsList() {
     const listContainer = elements.availableSongsList;
-    listContainer.innerHTML = ''; // Clear previous items
+    listContainer.innerHTML = ''; 
 
     if (state.history.length === 0) {
         listContainer.innerHTML = '<p class="empty-message">No songs in history to add.</p>';
@@ -140,7 +148,7 @@ export function saveNewPlaylist() {
 
     // Create new playlist object
     const newPlaylist = {
-        id: `playlist_${Date.now()}_${Math.random().toString(16).slice(2)}`, // Simple unique ID
+        id: `playlist_${Date.now()}_${Math.random().toString(16).slice(2)}`, 
         name: playlistName,
         songs: selectedSongIds
     };
@@ -152,17 +160,10 @@ export function saveNewPlaylist() {
     Storage.savePlaylists();
 
     // Update the UI panel
-    UI.updatePlaylistsPanel();
+    UI.updatePlaylistsPanel(); 
 
     // Close the modal
     Modal.closeModal(elements.createPlaylistModal);
-
-    // Optional: Select the newly created playlist automatically?
-    // state.currentPlaylistId = newPlaylist.id;
-    // state.currentPlaylistIndex = 0;
-    // Storage.saveCurrentPlaylistInfo();
-    // UI.updateCurrentPlaylistPanel();
-    // if (newPlaylist.songs.length > 0) loadSongFromPlaylist(0);
 }
 
 /**
@@ -174,29 +175,20 @@ export function createNewSong() {
     const songIsNotEmpty = state.currentSong.title || 
                            state.currentSong.artist || 
                            (state.currentSong.lyrics && state.currentSong.lyrics.length > 0) ||
-                           state.currentSong.audioFilename; // Consider audio as content too
+                           state.currentSong.audioFilename; 
 
     if (songIsNotEmpty) {
-        // Attempt to save the current song.
-        // Storage.saveProject() will alert if title/artist are missing and are required for saving.
-        // If saveProject determines the song can be saved (or user provides missing info), it returns true.
         const savedSuccessfully = Storage.saveProject();
         
         if (savedSuccessfully) {
-            // If saved successfully, then reset to a new song state.
             resetCurrentSong();
-            UI.updateUI(); // Update all UI elements to reflect the new state
+            UI.updateUI(); 
         } else {
-            // Save was not successful (e.g., validation failed within saveProject, or user cancelled when prompted for info).
-            // In this case, do not proceed to reset. The user needs to resolve the save issue or explicitly clear.
             console.log("Current song not saved or save was cancelled. New song creation aborted.");
-            // Optionally, you could offer a "Discard changes and create new song?" confirmation here
-            // but for now, it's a strict save-first (if content exists) policy.
         }
     } else {
-        // Current song is already effectively empty or considered new, so just reset.
         resetCurrentSong();
-        UI.updateUI(); // Update all UI elements
+        UI.updateUI(); 
     }
 }
 
@@ -205,6 +197,6 @@ export function createNewSong() {
  */
 export function toggleAutoAdvance() {
     state.autoAdvanceEnabled = !state.autoAdvanceEnabled;
-    UI.updateAutoAdvanceButton(); // Update button's visual state
-    Storage.saveCurrentPlaylistInfo(); // Save the new setting
+    UI.updateAutoAdvanceButton(); 
+    Storage.saveCurrentPlaylistInfo(); 
 }

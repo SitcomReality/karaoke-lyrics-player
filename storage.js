@@ -208,7 +208,7 @@ export function saveProject() {
     saveCurrentSongState(); // Save current state separately
 
     // Update history panel in UI
-    UI.updateHistoryPanel();
+    UI.updateHistoryPanel(); // This function is now re-exported from ui.js
 
     alert('Project saved successfully!');
     return true; // Indicate success

@@ -7,21 +7,16 @@ import * as Lyrics from './lyrics.js';
 import * as Storage from './storage.js';
 
 export function setupInitialAudio() {
-    // Initial audio setup logic remains the same,
-    // audioFilename will be null initially or after page load, which is correct.
     if (state.currentSong && state.currentSong.audioUrl) {
-        // If there's an audio URL stored in the current song state (e.g., from session storage)
-        // We need to be careful here, as Blob URLs might not persist across page loads
-        // A better approach might be needed for persistent audio without re-upload
         try {
             state.audio = new Audio(state.currentSong.audioUrl);
             setupAudioListeners();
         } catch (e) {
             console.warn("Could not reload audio from stored URL:", e);
-            state.currentSong.audioUrl = null; // Clear invalid URL
-            state.currentSong.audioFilename = null; // Clear filename too
+            state.currentSong.audioUrl = null; 
+            state.currentSong.audioFilename = null; 
             state.audio = null;
-            UI.updateUI(); // Update UI to reflect cleared audio state
+            UI.updateUI(); 
         }
     }
 }
@@ -32,31 +27,29 @@ export function setupAudioListeners() {
     state.audio.addEventListener('loadedmetadata', () => {
         state.duration = state.audio.duration;
         updateTimeDisplay();
-        UI.updateProgressUI(); // Update progress bar to show duration
+        UI.updateProgressUI(); 
     });
 
     state.audio.addEventListener('timeupdate', () => {
         state.currentTime = state.audio.currentTime;
         updateTimeDisplay();
         UI.updateProgressUI();
-        Lyrics.updateHighlightedLyrics(); // Sync lyrics
+        Lyrics.updateHighlightedLyrics(); 
     });
 
     state.audio.addEventListener('ended', () => {
         state.isPlaying = false;
         elements.playBtn.innerHTML = '<i class="fas fa-play"></i>';
-        state.currentTime = 0; // Reset time
-        UI.updateProgressUI(); // Reset progress bar visually
-        state.currentLineIndex = -1; // Reset lyrics highlight
+        state.currentTime = 0; 
+        UI.updateProgressUI(); 
+        state.currentLineIndex = -1; 
         Lyrics.renderLyrics();
 
-        // Auto play next song if in playlist AND auto-advance is enabled
         if (state.currentPlaylistId && state.autoAdvanceEnabled) {
             setTimeout(() => Playlist.playNextSong(), 1500);
         }
     });
 
-    // Apply initial volume
     state.audio.volume = parseFloat(elements.volumeSlider.value);
 }
 
@@ -70,7 +63,6 @@ export function togglePlay() {
         state.audio.pause();
         elements.playBtn.innerHTML = '<i class="fas fa-play"></i>';
     } else {
-        // Check if context needs resuming (required after user interaction)
         if (state.audioContext && state.audioContext.state === 'suspended') {
             state.audioContext.resume();
         }
@@ -88,10 +80,9 @@ export function seekAudio(e) {
     const x = e.clientX - bounds.left;
     const width = bounds.width;
     let percentage = x / width;
-    percentage = Math.max(0, Math.min(1, percentage)); // Clamp between 0 and 1
+    percentage = Math.max(0, Math.min(1, percentage)); 
 
     state.audio.currentTime = percentage * state.duration;
-    // The 'timeupdate' event will handle UI updates
 }
 
 export function adjustVolume() {
@@ -102,7 +93,7 @@ export function adjustVolume() {
 }
 
 export function updateTimeDisplay() {
-    if (!state.duration) { // Use duration to check if audio is loaded
+    if (!state.duration) { 
         elements.timeDisplay.textContent = '0:00 / 0:00';
         return;
     }
@@ -122,22 +113,21 @@ export function handleAudioUpload(e) {
 
     if (state.audio) {
         state.audio.pause();
-        URL.revokeObjectURL(state.audio.src); // Clean up old object URL
+        URL.revokeObjectURL(state.audio.src); 
         state.audio = null;
     }
 
     const audioUrl = URL.createObjectURL(file);
     state.audio = new Audio(audioUrl);
-    state.currentSong.audioUrl = audioUrl; // Store the URL
-    state.currentSong.audioFilename = file.name; // Store the filename
+    state.currentSong.audioUrl = audioUrl; 
+    state.currentSong.audioFilename = file.name; 
     state.isPlaying = false;
     state.currentTime = 0;
     elements.playBtn.innerHTML = '<i class="fas fa-play"></i>';
 
-    setupAudioListeners(); // Add listeners to the new audio object
+    setupAudioListeners(); 
 
-    // Try to extract song info from filename if not already set
-    const filename = file.name.replace(/\.[^/.]+$/, ""); // remove extension
+    const filename = file.name.replace(/\.[^/.]+$/, ""); 
     if (!state.currentSong.title && !state.currentSong.artist) {
         const parts = filename.split(' - ');
         if (parts.length > 1) {
@@ -145,10 +135,10 @@ export function handleAudioUpload(e) {
             state.currentSong.title = parts.slice(1).join(' - ').trim();
         } else {
             state.currentSong.title = filename.trim();
-            state.currentSong.artist = ''; // Reset artist if only title is parsed
+            state.currentSong.artist = ''; 
         }
     }
 
-    Storage.saveCurrentSongState(); // Save potentially updated title/artist and audioUrl
-    UI.updateUI(); // Update the entire UI, which includes song info fields and the new audio filename
+    Storage.saveCurrentSongState(); 
+    UI.updateUI(); 
 }
