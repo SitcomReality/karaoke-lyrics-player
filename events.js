@@ -26,10 +26,10 @@ export function setupEventListeners() {
     elements.nextLineBtn.addEventListener('click', Lyrics.markNextLine);
     elements.resetTimingBtn.addEventListener('click', Lyrics.resetTiming);
     elements.editTimingModeBtn.addEventListener('click', Lyrics.toggleEditMode);
-    elements.saveProjectBtn.addEventListener('click', Storage.saveProject);
+    elements.saveProjectBtn.addEventListener('click', () => Storage.saveProject()); // Explicit save, not silent
 
     // Lyrics editing
-    elements.editLyricsBtn.addEventListener('click', () => openLyricsEditor());
+    elements.editLyricsBtn.addEventListener('click', () => Lyrics.openLyricsEditor()); // Corrected: Lyrics.openLyricsEditor
     elements.saveLyricsBtn.addEventListener('click', Lyrics.saveLyricsFromEditor);
     elements.cancelLyricsBtn.addEventListener('click', () => Modal.closeModal(elements.lyricsEditorModal));
 
@@ -67,9 +67,9 @@ export function setupEventListeners() {
 
         if (e.code === 'Space' && !Modal.isAnyModalOpen() && !isInputActive) {
             e.preventDefault(); 
-            if (activeElement === elements.playBtn) {
+            if (activeElement === elements.playBtn || document.body === activeElement /* if no specific element is focused */) {
                  elements.playBtn.click();
-            } else {
+            } else if (Lyrics.state.editMode || (state.currentSong.lyrics && state.currentSong.lyrics.length > 0 && state.audio)) { // Allow space for next line if in edit mode or if lyrics and audio exist
                  Lyrics.markNextLine();
             }
         }
@@ -98,12 +98,11 @@ function handleSongInfoChange() {
     state.currentSong.title = elements.songTitle.value;
     state.currentSong.artist = elements.songArtist.value;
     Storage.saveCurrentSongState();
-}
 
-function openLyricsEditor() {
-    const currentLyrics = state.currentSong.lyrics.join('\n');
-    elements.lyricsEditor.value = currentLyrics;
-    Modal.openModal(elements.lyricsEditorModal);
+    // Auto-save to history if title/artist and lyrics exist
+    if ((state.currentSong.title || state.currentSong.artist) && state.currentSong.lyrics && state.currentSong.lyrics.length > 0) {
+        Storage.saveProject(true); // true for silent save
+    }
 }
 
 function handleOpenColorEditor() {

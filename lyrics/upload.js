@@ -1,7 +1,8 @@
 // lyrics/upload.js - Handlers for uploading lyrics files
-import { parseLyrics } from './lyrics.js';
-import { renderLyrics } from './lyrics.js';
+import { parseLyrics } from './core.js';
+import { renderLyrics } from './render.js';
 import * as Storage from '../storage.js';
+import { state } from '../state.js';
 
 /**
  * Handles the upload of a lyrics file (txt or lrc).
@@ -18,6 +19,11 @@ export function handleLyricsUpload(e) {
         parseLyrics(content);
         renderLyrics();
         Storage.saveCurrentSongState();
+
+        // Auto-save to history if title/artist and lyrics exist
+        if ((state.currentSong.title || state.currentSong.artist) && state.currentSong.lyrics && state.currentSong.lyrics.length > 0) {
+            Storage.saveProject(true); // true for silent save
+        }
     };
     reader.readAsText(file);
     e.target.value = '';

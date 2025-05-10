@@ -11,14 +11,14 @@ const CURRENT_PLAYLIST_KEY = 'karaoke_current_playlist_v2'; // Updated key versi
 
 export function saveCurrentSongState() {
     // Don't save default/empty song state over potentially useful loaded state
-    if (!state.currentSong.title && !state.currentSong.artist && state.currentSong.lyrics.length === 0) {
-        // console.log("Skipping save of empty current song state.");
+    if (!state.currentSong.id && !state.currentSong.title && !state.currentSong.artist && state.currentSong.lyrics.length === 0 && !state.currentSong.audioFilename && !state.currentSong.image) {
+        // console.log("Skipping save of entirely empty current song state to avoid overwriting a loaded song with nothing.");
         return;
     }
     try {
         // Store only serializable data for the current song
         const serializableSong = {
-            id: state.currentSong.id,
+            id: state.currentSong.id || Date.now().toString(), // Ensure ID exists
             title: state.currentSong.title,
             artist: state.currentSong.artist,
             lyrics: state.currentSong.lyrics,
@@ -31,7 +31,9 @@ export function saveCurrentSongState() {
         localStorage.setItem(CURRENT_SONG_KEY, JSON.stringify(serializableSong));
     } catch (e) {
         console.error("Error saving current song state:", e);
-        alert("Could not save current song progress. LocalStorage might be full.");
+        if (!state.currentSong.id) { // Check if we are in a situation where alerts were suppressed
+             alert("Could not save current song progress. LocalStorage might be full.");
+        }
     }
 }
 
@@ -173,10 +175,12 @@ function loadCurrentPlaylistInfo() {
 
 // --- Project Saving (Adding/Updating History) ---
 
-export function saveProject() {
+export function saveProject(silent = false) {
     const currentSong = state.currentSong;
     if (!currentSong.title && !currentSong.artist) {
-        alert('Please set a song title or artist before saving.');
+        if (!silent) {
+            alert('Please set a song title or artist before saving.');
+        }
         return false; // Indicate failure
     }
     if (!currentSong.id) {
@@ -205,12 +209,14 @@ export function saveProject() {
 
     // Save history and the current (potentially modified) song state
     saveHistory();
-    saveCurrentSongState(); // Save current state separately
+    // saveCurrentSongState(); // Current song state should already be up-to-date by the caller or implicitly by modifying state.currentSong
 
     // Update history panel in UI
-    UI.updateHistoryPanel(); // This function is now re-exported from ui.js
+    UI.updateHistoryPanel();
 
-    alert('Project saved successfully!');
+    if (!silent) {
+        alert('Project saved successfully!');
+    }
     return true; // Indicate success
 }
 

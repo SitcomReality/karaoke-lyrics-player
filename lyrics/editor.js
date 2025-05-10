@@ -32,10 +32,15 @@ export function saveLyricsFromEditor() {
 
     // Remap timing by matching lines
     handleTimingAfterEdit(oldLyrics, oldTiming);
-
+    
+    renderLyrics(); // Render lyrics after parsing and timing remapping
     Modal.closeModal(elements.lyricsEditorModal);
     Storage.saveCurrentSongState();
-    renderLyrics();
+
+    // Auto-save to history if title/artist and lyrics exist
+    if ((state.currentSong.title || state.currentSong.artist) && state.currentSong.lyrics && state.currentSong.lyrics.length > 0) {
+        Storage.saveProject(true); // true for silent save
+    }
 }
 
 /**
