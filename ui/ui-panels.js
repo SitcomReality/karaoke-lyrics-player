@@ -171,7 +171,7 @@ export function updateCurrentPlaylistPanel() {
 
     elements.currentPlaylistPanel.innerHTML = `
         <h4>${currentPlaylist.name}</h4>
-        <div class="playlist-songs panel"></div>
+        <div class="playlist-songs"></div>
     `;
 
     const songsContainer = elements.currentPlaylistPanel.querySelector('.playlist-songs');
