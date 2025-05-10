@@ -2,7 +2,7 @@
 import { state, resetCurrentSong } from './state.js';
 import { elements } from './dom.js';
 import * as Storage from './storage.js';
-import * as UI from './ui.js';
+import * as UI from './ui/index.js'; // Corrected import path
 import * as Modal from './modal.js'; // Import Modal for closeModal
 
 export function setupImportExport() {
