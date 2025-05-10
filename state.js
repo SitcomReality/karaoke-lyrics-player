@@ -30,6 +30,7 @@ export const state = {
     playlists: [], // Array of playlist objects { id, name, songs: [songId1, songId2] }
     currentPlaylistId: null,
     currentPlaylistIndex: -1, // Index within the current playlist
+    autoAdvanceEnabled: true, // New state for auto-advance
     history: [] // Array of song objects (or song IDs)
 };
 

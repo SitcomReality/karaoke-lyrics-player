@@ -289,6 +289,17 @@
     padding: 0;
 }
 
+#toggle-auto-advance-btn {
+    position: relative; 
+}
+
+#toggle-auto-advance-btn.active {
+}
+
+#toggle-auto-advance-btn:not(.active) .fa-forward {
+    opacity: 0.5; 
+}
+
 /* Theme settings preview */
 .color-theme {
     display: flex;

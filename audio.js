@@ -50,8 +50,8 @@ export function setupAudioListeners() {
         state.currentLineIndex = -1; // Reset lyrics highlight
         Lyrics.renderLyrics();
 
-        // Auto play next song if in playlist
-        if (state.currentPlaylistId) {
+        // Auto play next song if in playlist AND auto-advance is enabled
+        if (state.currentPlaylistId && state.autoAdvanceEnabled) {
             setTimeout(() => Playlist.playNextSong(), 1500);
         }
     });

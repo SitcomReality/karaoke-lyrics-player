@@ -5,7 +5,7 @@ import * as UI from './ui.js'; // To update UI after loading
 const HISTORY_KEY = 'karaoke_history';
 const PLAYLISTS_KEY = 'karaoke_playlists';
 const CURRENT_SONG_KEY = 'karaoke_current_song_v2'; // Use versioning if structure changes
-const CURRENT_PLAYLIST_KEY = 'karaoke_current_playlist';
+const CURRENT_PLAYLIST_KEY = 'karaoke_current_playlist_v2'; // Updated key version for new property
 
 // --- Saving ---
 
@@ -66,7 +66,8 @@ export function saveCurrentPlaylistInfo() {
      if (state.currentPlaylistId) {
         localStorage.setItem(CURRENT_PLAYLIST_KEY, JSON.stringify({
             id: state.currentPlaylistId,
-            index: state.currentPlaylistIndex
+            index: state.currentPlaylistIndex,
+            autoAdvance: state.autoAdvanceEnabled // Save auto-advance state
         }));
     } else {
         localStorage.removeItem(CURRENT_PLAYLIST_KEY); // Clear if no playlist is active
@@ -147,20 +148,26 @@ function loadCurrentPlaylistInfo() {
     const currentPlaylistData = localStorage.getItem(CURRENT_PLAYLIST_KEY);
     if (currentPlaylistData) {
         try {
-            const { id, index } = JSON.parse(currentPlaylistData);
+            const { id, index, autoAdvance } = JSON.parse(currentPlaylistData);
             // Verify the playlist ID still exists in the loaded playlists
             if (state.playlists.some(p => p.id === id)) {
                 state.currentPlaylistId = id;
                 state.currentPlaylistIndex = index;
+                state.autoAdvanceEnabled = typeof autoAdvance === 'boolean' ? autoAdvance : true; // Load auto-advance, default to true
             } else {
                  state.currentPlaylistId = null;
                  state.currentPlaylistIndex = -1;
+                 state.autoAdvanceEnabled = true; // Default if playlist no longer exists
             }
         } catch (e) {
             console.error("Error parsing current playlist info:", e);
             state.currentPlaylistId = null;
             state.currentPlaylistIndex = -1;
+            state.autoAdvanceEnabled = true; // Default on error
         }
+    } else {
+        // If no saved playlist info, ensure autoAdvance is default
+        state.autoAdvanceEnabled = true;
     }
 }
 

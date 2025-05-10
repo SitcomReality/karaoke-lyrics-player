@@ -199,3 +199,12 @@ export function createNewSong() {
         UI.updateUI(); // Update all UI elements
     }
 }
+
+/**
+ * Toggles the auto-advance feature for playlists.
+ */
+export function toggleAutoAdvance() {
+    state.autoAdvanceEnabled = !state.autoAdvanceEnabled;
+    UI.updateAutoAdvanceButton(); // Update button's visual state
+    Storage.saveCurrentPlaylistInfo(); // Save the new setting
+}

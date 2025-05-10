@@ -34,6 +34,7 @@ export const elements = {
     prevSongBtn: document.getElementById('prev-song-btn'),
     nextSongBtn: document.getElementById('next-song-btn'),
     addNewSongBtn: document.getElementById('add-new-song-btn'),
+    toggleAutoAdvanceBtn: document.getElementById('toggle-auto-advance-btn'), 
 
     // Panels
     historyPanel: document.getElementById('history-panel'),

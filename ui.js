@@ -9,7 +9,7 @@ import * as Playlist from './playlist.js'; // Needed for loading songs from pane
 import * as Modal from './modal.js'; // Needed for editing playlists
 
 // Export functions that might be called directly from other modules
-export { updateHistoryPanel, updatePlaylistsPanel, updateCurrentPlaylistPanel, updateUI, updateProgressUI, updatePlayerControls, updateExtractedPaletteDisplay };
+export { updateHistoryPanel, updatePlaylistsPanel, updateCurrentPlaylistPanel, updateUI, updateProgressUI, updatePlayerControls, updateExtractedPaletteDisplay, updateAutoAdvanceButton };
 
 function updateUI() {
     updateSongInfo();
@@ -24,6 +24,7 @@ function updateUI() {
     updateProgressUI(); // Add this line to ensure progress bar is updated initially
     Audio.updateTimeDisplay(); // Update time display
     updateExtractedPaletteDisplay(); // Update palette display on general UI updates too
+    updateAutoAdvanceButton(); // Update auto-advance button state
 }
 
 function updateSongInfo() {
@@ -251,6 +252,7 @@ function updateCurrentPlaylistPanel() {
         // Disable prev/next buttons if no playlist or empty
         elements.prevSongBtn.disabled = true;
         elements.nextSongBtn.disabled = true;
+        elements.toggleAutoAdvanceBtn.disabled = true; // Disable auto-advance toggle
         return;
     }
 
@@ -310,8 +312,11 @@ function updateCurrentPlaylistPanel() {
     });
 
     // Enable prev/next buttons if playlist has songs
-    elements.prevSongBtn.disabled = currentPlaylist.songs.length <= 1;
-    elements.nextSongBtn.disabled = currentPlaylist.songs.length <= 1;
+    const hasMultipleSongs = currentPlaylist.songs.length > 1;
+    elements.prevSongBtn.disabled = !hasMultipleSongs;
+    elements.nextSongBtn.disabled = !hasMultipleSongs;
+    elements.toggleAutoAdvanceBtn.disabled = false; // Enable auto-advance toggle if playlist is active
+    updateAutoAdvanceButton(); // Ensure its visual state is correct
 }
 
 function updatePlayerControls() {
@@ -389,4 +394,25 @@ function updateExtractedPaletteDisplay() {
             displayElement.appendChild(p);
         }
     }
+}
+
+/**
+ * Updates the visual state of the auto-advance toggle button.
+ */
+function updateAutoAdvanceButton() {
+    const btn = elements.toggleAutoAdvanceBtn;
+    if (state.autoAdvanceEnabled) {
+        btn.classList.add('active');
+        btn.title = 'Auto-Advance On (Click to disable)';
+        btn.innerHTML = '<i class="fas fa-forward"></i>'; // Or a more specific "on" icon
+    } else {
+        btn.classList.remove('active');
+        btn.title = 'Auto-Advance Off (Click to enable)';
+        // You could use a different icon for "off" state, e.g., fa-ban over fa-forward
+        // For simplicity, we'll just use the dimmed state via CSS.
+        btn.innerHTML = '<i class="fas fa-forward"></i>'; // Re-ensure icon if it was complex
+    }
+    // Disable if no current playlist or it's empty
+    const currentPlaylist = getCurrentPlaylist();
+    btn.disabled = !currentPlaylist || !currentPlaylist.songs || currentPlaylist.songs.length === 0;
 }
