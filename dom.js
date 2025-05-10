@@ -108,4 +108,8 @@ export const elements = {
 
     // Root element for theme variables
     root: document.documentElement,
+
+    // Main layout elements referenced by presentation mode
+    mainContentArea: document.getElementById('main-content-area'),
+    playerSectionArea: document.getElementById('player-section-area'),
 };

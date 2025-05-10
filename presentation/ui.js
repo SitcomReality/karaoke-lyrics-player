@@ -130,20 +130,33 @@ function createAudioVisualizer() {
  * Update the presentation UI with current song data
  */
 export function updatePresentationUI() {
-  const mainContent = elements.mainContent;
+  const mainContent = elements.mainContentArea; // Use mainContentArea
   
+  if (!mainContent) {
+    console.error("Main content area not found for presentation UI setup.");
+    return;
+  }
+  if (!elements.lyricsContainer) {
+    console.error("Lyrics container not found for presentation UI setup.");
+    return;
+  }
+  if (!elements.playerSectionArea) { // Use playerSectionArea
+     console.error("Player section area not found for presentation UI setup.");
+  }
+
   // Add header to the DOM if not already present
-  if (!mainContent.contains(presentationElements.headerContainer)) {
+  // Ensure presentationElements.headerContainer is not null before using it
+  if (presentationElements.headerContainer && !mainContent.contains(presentationElements.headerContainer)) {
     mainContent.insertBefore(presentationElements.headerContainer, mainContent.firstChild);
   }
   
   // Add settings panel if not already in DOM
-  if (!document.body.contains(presentationElements.settingsPanel)) {
+  if (presentationElements.settingsPanel && !document.body.contains(presentationElements.settingsPanel)) {
     document.body.appendChild(presentationElements.settingsPanel);
   }
   
   // Add visualizer if not already in DOM
-  if (!elements.lyricsContainer.contains(presentationElements.visualizer)) {
+  if (presentationElements.visualizer && elements.lyricsContainer && !elements.lyricsContainer.contains(presentationElements.visualizer)) {
     elements.lyricsContainer.appendChild(presentationElements.visualizer);
   }
   
@@ -151,7 +164,9 @@ export function updatePresentationUI() {
   updateHeaderContent();
   
   // Setup player styling
-  elements.playerSection.classList.add('presentation-player');
+  if (elements.playerSectionArea) {
+      elements.playerSectionArea.classList.add('presentation-player');
+  }
   
   // Update settings panel values
   updateSettingsPanelValues();
@@ -167,6 +182,11 @@ function updateHeaderContent() {
   const titleElement = presentationElements.headerContainer.querySelector('.song-title');
   const artistElement = presentationElements.headerContainer.querySelector('.song-artist');
   
+  if (!headerImg || !titleElement || !artistElement) {
+    console.error("Header content elements not found within presentation header.");
+    return;
+  }
+
   // Set header image
   if (state.currentSong.image) {
     headerImg.src = state.currentSong.image;
@@ -192,6 +212,11 @@ function updateSettingsPanelValues() {
   const webcamPositionSelect = panel.querySelector('#webcam-position');
   const webcamWidthInput = panel.querySelector('#webcam-width');
   const webcamHeightInput = panel.querySelector('#webcam-height');
+
+  if (!showHeaderCheckbox || !animationSelect || !enableWebcamCheckbox || !webcamPositionSelect || !webcamWidthInput || !webcamHeightInput) {
+      console.error("One or more settings panel controls not found.");
+      return;
+  }
   
   showHeaderCheckbox.checked = state.presentation.showHeader;
   animationSelect.value = state.presentation.animationType;
@@ -206,7 +231,9 @@ function updateSettingsPanelValues() {
  */
 export function cleanupPresentationUI() {
   // Remove presentation-specific classes
-  elements.playerSection.classList.remove('presentation-player');
+  if (elements.playerSectionArea) {
+      elements.playerSectionArea.classList.remove('presentation-player');
+  }
   
   // Remove header if present
   if (presentationElements.headerContainer && presentationElements.headerContainer.parentElement) {
@@ -272,7 +299,7 @@ export function updateHeaderVisibility() {
  * Scroll to the active lyric line in presentation mode
  */
 export function scrollToActiveLyricPresentation() {
-  if (state.currentLineIndex < 0) return;
+  if (state.currentLineIndex < 0 || !elements.lyricsContainer) return;
   
   const activeElement = elements.lyricsContainer.querySelector(`.lyrics-line[data-index="${state.currentLineIndex}"]`);
   if (!activeElement) return;
