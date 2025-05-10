@@ -2,7 +2,7 @@
 import ColorThief from 'color-thief';
 import { rgbToHex } from './colorUtils.js';
 import { state } from './state.js';
-import { updateExtractedPaletteDisplay } from './ui.js'; // This import should still work as ui.js re-exports it
+import { updateExtractedPaletteDisplay } from './ui/index.js';
 
 /**
  * Extracts a color palette from an image element using ColorThief.

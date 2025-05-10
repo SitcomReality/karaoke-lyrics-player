@@ -2,7 +2,7 @@
 import { state } from './state.js';
 import { elements } from './dom.js';
 import * as Audio from './audio.js';
-import * as UI from './ui.js';
+import * as UI from './ui/index.js';
 import * as Lyrics from './lyrics.js';
 import * as Storage from './storage.js';
 import * as Theme from './theme/index.js'; 

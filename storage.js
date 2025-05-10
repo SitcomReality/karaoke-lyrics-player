@@ -1,6 +1,6 @@
 // Local and Session Storage functions
 import { state, resetCurrentSong } from './state.js';
-import * as UI from './ui.js'; // To update UI after loading
+import * as UI from './ui/index.js'; // To update UI after loading
 
 const HISTORY_KEY = 'karaoke_history';
 const PLAYLISTS_KEY = 'karaoke_playlists';

@@ -2,7 +2,7 @@
 import { state } from './state.js';
 import { elements } from './dom.js';
 import * as Storage from './storage.js';
-import * as UI from './ui.js'; // May need UI updates after actions
+import * as UI from './ui/index.js'; // May need UI updates after actions
 import * as Modal from './modal.js';
 
 export function handleLyricsUpload(e) {

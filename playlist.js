@@ -1,7 +1,7 @@
 // Playlist management functions
 import { state, resetCurrentSong, getCurrentPlaylist } from './state.js'; 
 import { elements } from './dom.js'; 
-import * as UI from './ui.js';
+import * as UI from './ui/index.js';
 import * as Storage from './storage.js';
 import * as Modal from './modal.js'; 
 

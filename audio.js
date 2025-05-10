@@ -1,7 +1,7 @@
 // Audio playback and control functions
 import { state } from './state.js';
 import { elements } from './dom.js';
-import * as UI from './ui.js';
+import * as UI from './ui/index.js';
 import * as Playlist from './playlist.js';
 import * as Lyrics from './lyrics.js';
 import * as Storage from './storage.js';
