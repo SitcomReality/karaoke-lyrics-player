@@ -1,7 +1,6 @@
 // lyrics/render.js - Rendering UI for lyrics and scroll logic
 import { state } from '../state.js';
 import { elements } from '../dom.js';
-import { scrollToActiveLine } from './render.js'; // self import for clarity
 
 /**
  * Renders all lyrics to the page, displaying timestamps if present.
