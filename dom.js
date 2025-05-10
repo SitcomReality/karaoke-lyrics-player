@@ -90,6 +90,15 @@ export const elements = {
     availableSongsList: document.getElementById('available-songs-list'),
     savePlaylistBtn: document.getElementById('save-playlist-btn'),
 
+    // Edit Playlist Modal
+    editPlaylistModal: document.getElementById('edit-playlist-modal'),
+    editPlaylistNameInput: document.getElementById('edit-playlist-name-input'),
+    songsInPlaylistList: document.getElementById('songs-in-playlist-list'),
+    editPlaylistAvailableSongsList: document.getElementById('edit-playlist-available-songs-list'),
+    addCurrentSongToPlaylistBtn: document.getElementById('add-current-song-to-playlist-btn'),
+    updatePlaylistBtn: document.getElementById('update-playlist-btn'),
+    cancelEditPlaylistBtn: document.getElementById('cancel-edit-playlist-btn'),
+
     // Lyrics editing
     editLyricsBtn: document.getElementById('edit-lyrics-btn'),
     lyricsEditorModal: document.getElementById('lyrics-editor-modal'),

@@ -237,10 +237,39 @@
             <h2>Create New Playlist</h2>
             <input type="text" id="playlist-name-input" placeholder="Playlist Name">
             <div class="available-songs">
-                <h3>Available Songs</h3>
+                <h3>Available Songs from History</h3>
                 <div id="available-songs-list" class="checklist"></div>
             </div>
             <button id="save-playlist-btn" class="btn primary-btn">Save Playlist</button>
+        </div>
+    </div>
+
+    <div id="edit-playlist-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Playlist</h2>
+            <input type="text" id="edit-playlist-name-input" placeholder="Playlist Name">
+            
+            <div class="playlist-editor-section">
+                <h3>Songs in this Playlist</h3>
+                <div id="songs-in-playlist-list" class="editable-song-list">
+                    <!-- Songs with remove buttons will be populated here -->
+                </div>
+            </div>
+
+            <div class="playlist-editor-section">
+                <h3>Add Songs from History</h3>
+                <div id="edit-playlist-available-songs-list" class="checklist">
+                    <!-- Available songs from history (not in current playlist) will be populated here -->
+                </div>
+            </div>
+            
+            <button id="add-current-song-to-playlist-btn" class="btn"><i class="fas fa-plus-circle"></i> Add Currently Loaded Song</button>
+            
+            <div class="modal-actions">
+                <button id="update-playlist-btn" class="btn primary-btn">Save Changes</button>
+                <button id="cancel-edit-playlist-btn" class="btn">Cancel</button>
+            </div>
         </div>
     </div>
 

@@ -636,3 +636,63 @@
     gap: 4px;
     flex-shrink: 0;
 }
+
+/* Edit Playlist Modal Specific Styles */
+.playlist-editor-section {
+    margin-top: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.playlist-editor-section h3 {
+    font-size: var(--font-size-normal); /* Smaller heading for sections within modal */
+    color: var(--on-surface);
+    border-bottom: 1px solid rgba(var(--rgb-on-surface), 0.1);
+    padding-bottom: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
+}
+
+.editable-song-list {
+    max-height: 150px; /* Or suitable height */
+    overflow-y: auto;
+    background-color: rgba(var(--rgb-on-surface), 0.03);
+    border-radius: 4px;
+    padding: var(--spacing-sm);
+}
+
+.editable-song-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: 4px;
+    margin-bottom: var(--spacing-xs);
+    background-color: rgba(var(--rgb-on-surface), 0.05);
+    color: var(--on-surface);
+}
+
+.editable-song-item span {
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: var(--spacing-sm);
+}
+
+.editable-song-item .action-btn.remove-song-from-playlist i {
+    color: var(--error-color); /* Make remove icon red */
+}
+.editable-song-item .action-btn.remove-song-from-playlist:hover i {
+    color: var(--on-surface);
+}
+
+#add-current-song-to-playlist-btn {
+    display: block;
+    margin: var(--spacing-md) auto; /* Center button */
+}
+
+.modal-actions {
+    margin-top: var(--spacing-lg);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+}

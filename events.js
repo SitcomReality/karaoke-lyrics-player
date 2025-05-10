@@ -60,6 +60,14 @@ export function setupEventListeners() {
     // Playlist modal controls
     elements.savePlaylistBtn.addEventListener('click', Playlist.saveNewPlaylist); 
 
+    // Edit Playlist Modal controls
+    elements.updatePlaylistBtn.addEventListener('click', Playlist.handleSavePlaylistChanges);
+    elements.addCurrentSongToPlaylistBtn.addEventListener('click', Playlist.handleAddCurrentlyLoadedSongToPlaylist);
+    elements.cancelEditPlaylistBtn.addEventListener('click', () => {
+        Modal.closeModal(elements.editPlaylistModal);
+        state.editingPlaylistId = null; // Clear editing state
+    });
+
     // Keyboard shortcut for marking next line
     document.addEventListener('keydown', (e) => {
         const activeElement = document.activeElement;

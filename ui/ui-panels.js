@@ -98,7 +98,7 @@ export function updatePlaylistsPanel() {
                 <div class="item-subtitle">${songCount} song${songCount !== 1 ? 's' : ''}</div>
             </div>
             <div class="item-actions">
-                <button class="action-btn edit-playlist" data-index="${index}" title="Edit Playlist">
+                <button class="action-btn edit-playlist" data-id="${playlist.id}" title="Edit Playlist">
                     <i class="fas fa-edit"></i>
                 </button>
                 <button class="action-btn delete-playlist" data-index="${index}" title="Delete Playlist">
@@ -130,9 +130,8 @@ export function updatePlaylistsPanel() {
     elements.playlistsPanel.querySelectorAll('.edit-playlist').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            const index = parseInt(btn.dataset.index);
-            console.log("Edit playlist button clicked for index:", index);
-            alert("Playlist editing not yet implemented.");
+            const playlistId = btn.dataset.id;
+            Playlist.openEditPlaylistModal(playlistId);
         });
     });
 

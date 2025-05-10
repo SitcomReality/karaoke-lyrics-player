@@ -31,7 +31,8 @@ export const state = {
     currentPlaylistId: null,
     currentPlaylistIndex: -1, // Index within the current playlist
     autoAdvanceEnabled: true, // New state for auto-advance
-    history: [] // Array of song objects (or song IDs)
+    history: [], // Array of song objects (or song IDs)
+    editingPlaylistId: null, // ID of the playlist currently being edited
 };
 
 export function resetCurrentSong() {
