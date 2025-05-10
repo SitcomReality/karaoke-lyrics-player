@@ -15,8 +15,6 @@ export function handleLyricsUpload(e) {
         parseLyrics(content);
         renderLyrics(); // Render new lyrics
         Storage.saveCurrentSongState(); // Save new lyrics and reset timing
-        // Optionally show edit button now that lyrics exist
-        elements.editLyricsBtn.style.display = 'inline-flex';
     };
     reader.readAsText(file);
     e.target.value = ''; // Reset file input
@@ -89,18 +87,13 @@ export function renderLyrics() {
 
         scrollToActiveLine();
 
-        // Show edit lyrics button as lyrics exist
-        elements.editLyricsBtn.style.display = 'inline-flex';
-
     } else {
         // Show placeholder message, hide lyrics container content
         elements.lyricsPlaceholder.style.display = 'flex'; // Use flex to center content
         elements.lyricsContainer.style.display = 'none'; // Hide container when placeholder is shown
-
-        // Hide edit lyrics button as no lyrics exist
-        elements.editLyricsBtn.style.display = 'none';
     }
-    // NOTE: The 'Upload Lyrics' button/label is always visible in its new location
+    // NOTE: The 'Upload Lyrics' and 'Edit Lyrics' buttons are always visible in their new location
+    // Their visibility is no longer controlled by this function.
 }
 
 function handleLyricLineClick(event) {
