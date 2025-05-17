@@ -4,6 +4,7 @@ import { elements } from './dom.js';
 import * as UI from './ui/index.js';
 import * as Storage from './storage.js';
 import * as Modal from '../modal.js';
+import * as AudioLocator from './audioLocator.js'; // Import new module
 
 // Module-level variable to store song IDs for the playlist being edited in the modal
 let tempEditingSongs = [];
@@ -11,44 +12,82 @@ let tempEditingSongs = [];
 export function loadSongFromHistory(index) {
     if (index < 0 || index >= state.history.length) return;
     
-    // Load the song data from history
     const historySong = state.history[index];
+    
+    const previouslyLoadedSongId = state.currentSong.id;
+    const previouslyLoadedAudioUrl = state.currentSong.audioUrl;
+    const previouslyLoadedImage = state.currentSong.image;
+
+    // Revoke old blob URLs if we are switching to a *different* song.
+    if (previouslyLoadedSongId && previouslyLoadedSongId !== historySong.id) {
+        if (previouslyLoadedAudioUrl && previouslyLoadedAudioUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(previouslyLoadedAudioUrl);
+        }
+        if (previouslyLoadedImage && previouslyLoadedImage.startsWith('blob:')) {
+            URL.revokeObjectURL(previouslyLoadedImage);
+        }
+    }
     
     // Update current song with history data
     state.currentSong = {
-        ...state.currentSong, 
+        ...state.currentSong, // Keep some things like presentation settings etc.
         id: historySong.id,
         title: historySong.title,
         artist: historySong.artist,
-        lyrics: [...historySong.lyrics],
-        timing: [...historySong.timing],
-        theme: { ...historySong.theme },
-        font: historySong.font,
-        audioUrl: state.currentSong.id === historySong.id ? state.currentSong.audioUrl : null,
-        image: state.currentSong.id === historySong.id ? state.currentSong.image : null,
-        audioFilename: state.currentSong.id === historySong.id ? state.currentSong.audioFilename : null,
+        lyrics: [...(historySong.lyrics || [])],
+        timing: [...(historySong.timing || [])],
+        theme: { ...(historySong.theme || state.currentSong.theme) },
+        font: historySong.font || state.currentSong.font,
+        
+        // If it's the same song, keep current blob URLs. Otherwise, null them out and use filename.
+        audioUrl: previouslyLoadedSongId === historySong.id ? previouslyLoadedAudioUrl : null,
+        image: previouslyLoadedSongId === historySong.id ? previouslyLoadedImage : (historySong.image || null),
+        audioFilename: historySong.audioFilename || null,
+        extractedPalette: previouslyLoadedSongId === historySong.id ? state.currentSong.extractedPalette : [],
     };
-    
+     // Ensure lyrics and timing are arrays even if undefined in historySong
+    if (!Array.isArray(state.currentSong.lyrics)) state.currentSong.lyrics = [];
+    if (!Array.isArray(state.currentSong.timing)) state.currentSong.timing = [];
+
     // Reset playback state
-    if (state.audio) {
-        state.audio.pause();
+    if (previouslyLoadedSongId !== historySong.id) {
+        if(state.audio) state.audio.pause();
+        state.audio = null; // Will be re-created if audio is found/loaded
         state.isPlaying = false;
-        if (state.currentSong.audioUrl) {
-            if (state.currentSong.id !== historySong.id) {
-                URL.revokeObjectURL(state.currentSong.audioUrl); 
-                state.currentSong.audioUrl = null;
-                state.currentSong.audioFilename = null;
-            }
+    } else { // Same song re-selected. Reset its playback.
+        if(state.audio) {
+            state.audio.pause();
+            state.audio.currentTime = 0; // Rewind it.
         }
+        state.isPlaying = false;
     }
+    
     state.currentTime = 0;
     state.currentLineIndex = -1;
     
-    // Update UI
-    UI.updateUI();
-    
-    // Save current state
-    Storage.saveCurrentSongState();
+    // Audio location logic
+    if (!state.currentSong.audioUrl && state.currentSong.audioFilename) {
+        AudioLocator.findAndLoadAudio(state.currentSong)
+            .then(audioLoaded => {
+                if (!audioLoaded) {
+                    // Audio was not found/loaded by locator, but song metadata is set.
+                    // UI.updateUI() ensures UI reflects this (e.g. play button disabled).
+                    UI.updateUI();
+                }
+                // Storage.saveCurrentSongState() is handled by processAudioFileAndUpdateState if loaded.
+                // If not loaded, current song state (with null audioUrl) should also be saved.
+                Storage.saveCurrentSongState();
+            })
+            .catch(error => {
+                console.error("Error in audio location process:", error);
+                UI.updateUI(); // Update UI to reflect error or no audio state
+                Storage.saveCurrentSongState();
+            });
+    } else {
+        // Audio already available (e.g. same song re-selected) or no filename to look for
+        UI.updateUI();
+        Storage.saveCurrentSongState();
+    }
 }
 
 export function playNextSong() {

@@ -12,6 +12,7 @@ import { extractColorsFromImage } from './colorExtractor.js';
 import * as Playlist from './playlist.js'; 
 import * as PlaylistIO from './playlistIO.js'; // Specific Playlist I/O
 import * as FolderPlaylistImport from './folderPlaylistImport.js'; // Import new module
+import * as AudioLocator from './audioLocator.js'; // Import new module
 
 export function setupEventListeners() {
     // Audio player controls
@@ -107,6 +108,21 @@ export function setupEventListeners() {
             }
         }
     });
+
+    // Locate Audio Modal listeners
+    if (elements.audioSourceFolderInput) { // Ensure elements exist
+        elements.audioSourceFolderInput.addEventListener('change', AudioLocator.handleAudioFolderSelected);
+    }
+    if (elements.skipLocatingAudioBtn) {
+        elements.skipLocatingAudioBtn.addEventListener('click', AudioLocator.handleSkipLocatingAudio);
+    }
+    // Assuming modal.js handles the 'X' button to call closeModal, we need to hook into that.
+    // A bit of a workaround: if locateAudioModal specific close button exists:
+    const locateAudioModalCloseBtn = elements.locateAudioModal?.querySelector('.close');
+    if (locateAudioModalCloseBtn) {
+        locateAudioModalCloseBtn.addEventListener('click', AudioLocator.handleLocateAudioModalClosed);
+    }
+    // If modal.js uses a generic approach, this might need adjustment in modal.js or AudioLocator.
 }
 
 function handleImageUpload(e) {

@@ -324,6 +324,28 @@
         </div>
     </div>
 
+    <div id="locate-audio-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Locate Audio File</h2>
+            <p>The audio file <strong id="missing-filename-display">filename.mp3</strong> for song <em id="missing-song-title-display">Song Title</em> could not be found locally.</p>
+            <p>Please select the folder where this audio file is stored:</p>
+            
+            <div style="margin: var(--spacing-md) 0;">
+                <label for="audio-source-folder-input-btn" class="btn primary-btn">
+                    <i class="fas fa-folder-open"></i> Select Audio Folder
+                </label>
+                <input type="file" id="audio-source-folder-input" webkitdirectory directory style="display: none;" />
+            </div>
+            
+            <p id="audio-locator-status" class="note" style="margin-top: var(--spacing-sm); min-height: 1.2em;"></p>
+            
+            <div class="modal-actions" style="margin-top: var(--spacing-md);">
+                <button id="skip-locating-audio-btn" class="btn">Skip Audio for this Song</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Import map for modern JS imports -->
     <script type="importmap">
     {

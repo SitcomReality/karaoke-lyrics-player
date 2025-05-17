@@ -131,4 +131,13 @@ export const elements = {
     // Folder Playlist Import
     importPlaylistFromFolderBtn: document.getElementById('import-playlist-from-folder-btn'),
     importFolderInput: document.getElementById('import-folder-input'),
+
+    // Locate Audio Modal
+    locateAudioModal: document.getElementById('locate-audio-modal'),
+    missingFilenameDisplay: document.getElementById('missing-filename-display'),
+    missingSongTitleDisplay: document.getElementById('missing-song-title-display'),
+    audioSourceFolderInputBtn: document.querySelector('label[for="audio-source-folder-input-btn"]'), 
+    audioSourceFolderInput: document.getElementById('audio-source-folder-input'),
+    audioLocatorStatus: document.getElementById('audio-locator-status'),
+    skipLocatingAudioBtn: document.getElementById('skip-locating-audio-btn'),
 };
