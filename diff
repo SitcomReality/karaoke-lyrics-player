@@ -135,24 +135,62 @@ export function setupAudioListeners() {
 
     // Set up audio analysis for visualization if Web Audio API is supported
     try {
-        if (!state.audioContext) {
+        if (!state.audio) { // Double-check state.audio, though top guard should suffice
+            // This case should ideally not be hit if the top guard `if (!state.audio) return;` is working.
+            // If it is hit, it means state.audio became null between the top guard and here, which is unlikely in sync code.
+            console.warn("setupAudioListeners: state.audio became null before visualizer setup. Skipping visualizer.");
+            state.audioAnalyser = null;
+            return;
+        }
+ 
+        if (!state.audioContext || state.audioContext.state === 'closed') {
+            console.log("setupAudioListeners: Creating or recreating AudioContext.");
+            // It's good practice to close an old context if recreating, though JS garbage collection should handle it.
+            // However, directly closing might not be necessary if simply reassigning.
             state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
-        
-        // Connect audio to analyzer
-        const source = state.audioContext.createMediaElementSource(state.audio);
-        const analyser = state.audioContext.createAnalyser();
-        
-        source.connect(analyser);
-        analyser.connect(state.audioContext.destination);
-        
-        // Configure analyzer
-        analyser.fftSize = 256;
-        
-        // Store analyzer for visualization
-        state.audioAnalyser = analyser;
+         
+        // Resume context if suspended (e.g., due to autoplay policies or page load)
+        if (state.audioContext && state.audioContext.state === 'suspended') {
+            state.audioContext.resume().catch(e => console.warn("setupAudioListeners: Failed to resume audio context:", e));
+        }
+ 
+        // Ensure audioContext is valid and ready before proceeding
+        if (state.audioContext && state.audioContext.state === 'running') {
+            // MediaElementAudioSourceNode can only be created once per HTMLMediaElement per AudioContext.
+            // Since cleanupOldAudio nulls state.audioAnalyser, we assume any old source/analyser chain is gone.
+            // A more robust (but complex) approach would be to track source nodes with MediaElements.
+            // For now, we rely on state.audio being a fresh element or listeners being correctly managed.
++
+            // If state.audio already has a source node in this context, creating another will throw.
+            // This check is difficult without tracking nodes externally.
+            // We assume that if we are here, `state.audio` is new or needs new connections.
+            // `cleanupOldAudio` should have nulled `state.audioAnalyser`, indicating a need for new setup.
+            if (state.audioAnalyser) {
+                // This implies a previous setup for the *current* state.audio exists.
+                // This shouldn't happen if cleanupOldAudio worked correctly before setting up a new audio element.
+                console.warn("setupAudioListeners: audioAnalyser already exists. Visualizer might be re-initialized or misbehaving.");
+            }
+             
+            const source = state.audioContext.createMediaElementSource(state.audio);
+            const analyser = state.audioContext.createAnalyser();
+             
+            source.connect(analyser);
+            analyser.connect(state.audioContext.destination);
+             
+            // Configure analyzer
+            analyser.fftSize = 256;
+             
+            // Store analyzer for visualization
+            state.audioAnalyser = analyser; // Store the new analyser
+            // console.log("setupAudioListeners: Audio visualizer setup complete.");
+        } else {
+            console.warn("setupAudioListeners: AudioContext not running. Visualizer not set up. State:", state.audioContext?.state);
+            state.audioAnalyser = null;
+        }
     } catch (e) {
-        console.warn('Web Audio API not supported for visualization:', e);
+        console.warn('setupAudioListeners: Web Audio API not supported or error during visualizer setup:', e);
+        state.audioAnalyser = null; // Ensure it's null on error
     }
 }
 
