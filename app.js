@@ -12,25 +12,53 @@ import * as MainImportExport from './importExport.js';
 import * as Events from './events.js';
 import * as Presentation from './presentation/index.js';
 
+// Import HTML structure generators
+import { createLeftSidebarHTML } from './ui/html/leftSidebar.js';
+import { createMainContentHTML } from './ui/html/mainContent.js';
+import { createRightSidebarHTML } from './ui/html/rightSidebar.js';
+import { createModalsHTML } from './ui/html/modals.js';
+
+/**
+ * Injects the main HTML structure into the DOM.
+ */
+function initializeDOMStructure() {
+    const appContainer = document.querySelector('.app-container');
+    if (appContainer) {
+        appContainer.innerHTML = `
+            ${createLeftSidebarHTML()}
+            ${createMainContentHTML()}
+            ${createRightSidebarHTML()}
+        `;
+    } else {
+        console.error("Fatal Error: '.app-container' not found in index.html. Cannot build UI.");
+        return;
+    }
+    document.body.insertAdjacentHTML('beforeend', createModalsHTML());
+}
+
 // Initialize application
 function init() {
-    // Load data from local storage
+    // 1. Build the main HTML structure from JS modules
+    initializeDOMStructure();
+
+    // 2. Initialize DOM element references now that HTML is in place
+    DOM.initializeElements(); 
+    
+    // 3. Load data from local storage
     Storage.loadFromLocalStorage();
     
-    // Set up event listeners (this will also call PlaylistIO.setupPlaylistIOModal)
+    // 4. Set up event listeners
     Events.setupEventListeners();
     
-    // Set up main project import/export functionality
-    // Note: MainImportExport.setupImportExport() is now called lazily from events.js when the main I/E button is clicked.
-    // This ensures that DOM elements for that modal are definitely ready.
-    
-    // Update UI with current state
+    // Main project import/export is set up lazily in events.js
+
+    // 5. Update UI with current state (needs DOM elements and loaded state)
     UI.updateUI();
 
-    // Set up initial audio state if necessary
+    // 6. Set up initial audio state if necessary
     Audio.setupInitialAudio();
     
-    // Initialize presentation mode
+    // 7. Initialize presentation mode
     Presentation.init();
 }
 

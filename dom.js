@@ -1,143 +1,124 @@
 // DOM Element references
 
-export const elements = {
-    // Audio player
-    playBtn: document.getElementById('play-btn'),
-    progressBar: document.getElementById('progress-bar'),
-    progress: document.getElementById('progress'),
-    timeDisplay: document.getElementById('time-display'),
-    volumeSlider: document.getElementById('volume-slider'),
+export let elements = {}; // Initialized by initializeElements()
 
-    // Song info
-    songTitle: document.getElementById('song-title'),
-    songArtist: document.getElementById('song-artist'),
-    songImage: document.getElementById('song-image'),
+export function initializeElements() {
+    elements.playBtn = document.getElementById('play-btn');
+    elements.progressBar = document.getElementById('progress-bar');
+    elements.progress = document.getElementById('progress');
+    elements.timeDisplay = document.getElementById('time-display');
+    elements.volumeSlider = document.getElementById('volume-slider');
 
-    // Lyrics
-    lyricsContainer: document.getElementById('lyrics-container'),
-    lyricsPlaceholder: document.querySelector('.lyrics-placeholder'),
+    elements.songTitle = document.getElementById('song-title');
+    elements.songArtist = document.getElementById('song-artist');
+    elements.songImage = document.getElementById('song-image');
 
-    // Upload controls
-    uploadAudio: document.getElementById('upload-audio'),
-    uploadImage: document.getElementById('upload-image'),
-    uploadLyrics: document.getElementById('upload-lyrics'),
-    lyricsUploadLabel: document.querySelector('label[for="upload-lyrics"]'),
-    audioFileInfo: document.getElementById('audio-file-info'), 
+    elements.lyricsContainer = document.getElementById('lyrics-container');
+    elements.lyricsPlaceholder = document.querySelector('.lyrics-placeholder');
 
-    // Timing controls
-    nextLineBtn: document.getElementById('next-line-btn'),
-    resetTimingBtn: document.getElementById('reset-timing-btn'),
-    editTimingModeBtn: document.getElementById('edit-timing-mode-btn'),
-    saveProjectBtn: document.getElementById('save-project-btn'),
+    elements.uploadAudio = document.getElementById('upload-audio');
+    elements.uploadImage = document.getElementById('upload-image');
+    elements.uploadLyrics = document.getElementById('upload-lyrics');
+    elements.lyricsUploadLabel = document.querySelector('label[for="upload-lyrics"]');
+    elements.audioFileInfo = document.getElementById('audio-file-info'); 
 
-    // Playlist controls
-    prevSongBtn: document.getElementById('prev-song-btn'),
-    nextSongBtn: document.getElementById('next-song-btn'),
-    addNewSongBtn: document.getElementById('add-new-song-btn'),
-    toggleAutoAdvanceBtn: document.getElementById('toggle-auto-advance-btn'), 
+    elements.nextLineBtn = document.getElementById('next-line-btn');
+    elements.resetTimingBtn = document.getElementById('reset-timing-btn');
+    elements.editTimingModeBtn = document.getElementById('edit-timing-mode-btn');
+    elements.saveProjectBtn = document.getElementById('save-project-btn');
 
-    // Panels
-    historyPanel: document.getElementById('history-panel'),
-    playlistsPanel: document.getElementById('playlists-panel'),
-    currentPlaylistPanel: document.getElementById('current-playlist-panel'),
+    elements.prevSongBtn = document.getElementById('prev-song-btn');
+    elements.nextSongBtn = document.getElementById('next-song-btn');
+    elements.addNewSongBtn = document.getElementById('add-new-song-btn');
+    elements.toggleAutoAdvanceBtn = document.getElementById('toggle-auto-advance-btn'); 
 
-    // Theme
-    primaryColor: document.getElementById('primary-color'),
-    secondaryColor: document.getElementById('secondary-color'),
-    accentColor: document.getElementById('accent-color'),
-    backgroundColor: document.getElementById('background-color'),
-    textColor: document.getElementById('text-color'),
-    fontSelector: document.getElementById('font-selector'),
+    elements.historyPanel = document.getElementById('history-panel');
+    elements.playlistsPanel = document.getElementById('playlists-panel');
+    elements.currentPlaylistPanel = document.getElementById('current-playlist-panel');
 
-    // Modal buttons
-    importExportBtn: document.getElementById('import-export-btn'),
-    editColorsBtn: document.getElementById('edit-colors-btn'),
-    createPlaylistBtn: document.getElementById('create-playlist'),
+    elements.primaryColor = document.getElementById('primary-color');
+    elements.secondaryColor = document.getElementById('secondary-color');
+    elements.accentColor = document.getElementById('accent-color');
+    elements.backgroundColor = document.getElementById('background-color');
+    elements.textColor = document.getElementById('text-color');
+    elements.fontSelector = document.getElementById('font-selector');
 
-    // Modals
-    importExportModal: document.getElementById('import-export-modal'),
-    colorEditModal: document.getElementById('color-edit-modal'),
-    customFontModal: document.getElementById('custom-font-modal'),
-    createPlaylistModal: document.getElementById('create-playlist-modal'),
+    elements.importExportBtn = document.getElementById('import-export-btn');
+    elements.editColorsBtn = document.getElementById('edit-colors-btn');
+    elements.createPlaylistBtn = document.getElementById('create-playlist');
 
-    // Modal elements
-    importJson: document.getElementById('import-json'),
-    exportJson: document.getElementById('export-json'),
-    copyJsonBtn: document.getElementById('copy-json-btn'),
-    importBtn: document.getElementById('import-btn'),
-    tabButtons: document.querySelectorAll('.tab-btn'), 
-    importTab: document.getElementById('import-tab'),
-    exportTab: document.getElementById('export-tab'),
-    modalCloseButtons: document.querySelectorAll('.modal .close'),
+    elements.importExportModal = document.getElementById('import-export-modal');
+    elements.colorEditModal = document.getElementById('color-edit-modal');
+    elements.customFontModal = document.getElementById('custom-font-modal');
+    elements.createPlaylistModal = document.getElementById('create-playlist-modal');
 
-    // Color inputs
-    primaryColorInput: document.getElementById('primary-color-input'),
-    secondaryColorInput: document.getElementById('secondary-color-input'),
-    accentColorInput: document.getElementById('accent-color-input'),
-    backgroundColorInput: document.getElementById('background-color-input'),
-    textColorInput: document.getElementById('text-color-input'),
-    applyColorsBtn: document.getElementById('apply-colors-btn'),
-    extractColorsBtn: document.getElementById('extract-colors-btn'),
-    extractedPaletteDisplay: document.getElementById('extracted-palette-display'),
-    applyExtractedThemeBtn: document.getElementById('apply-extracted-theme-btn'),
+    elements.importJson = document.getElementById('import-json');
+    elements.exportJson = document.getElementById('export-json');
+    elements.copyJsonBtn = document.getElementById('copy-json-btn');
+    elements.importBtn = document.getElementById('import-btn');
+    elements.tabButtons = document.querySelectorAll('#import-export-modal .tab-btn'); 
+    elements.importTab = document.getElementById('import-tab');
+    elements.exportTab = document.getElementById('export-tab');
+    elements.modalCloseButtons = document.querySelectorAll('.modal .close');
 
-    // Font modal
-    customFontInput: document.getElementById('custom-font-input'),
-    applyFontBtn: document.getElementById('apply-font-btn'),
+    elements.primaryColorInput = document.getElementById('primary-color-input');
+    elements.secondaryColorInput = document.getElementById('secondary-color-input');
+    elements.accentColorInput = document.getElementById('accent-color-input');
+    elements.backgroundColorInput = document.getElementById('background-color-input');
+    elements.textColorInput = document.getElementById('text-color-input');
+    elements.applyColorsBtn = document.getElementById('apply-colors-btn');
+    elements.extractColorsBtn = document.getElementById('extract-colors-btn');
+    elements.extractedPaletteDisplay = document.getElementById('extracted-palette-display');
+    elements.applyExtractedThemeBtn = document.getElementById('apply-extracted-theme-btn');
 
-    // Playlist modal
-    playlistNameInput: document.getElementById('playlist-name-input'),
-    availableSongsList: document.getElementById('available-songs-list'),
-    savePlaylistBtn: document.getElementById('save-playlist-btn'),
+    elements.customFontInput = document.getElementById('custom-font-input');
+    elements.applyFontBtn = document.getElementById('apply-font-btn');
 
-    // Edit Playlist Modal
-    editPlaylistModal: document.getElementById('edit-playlist-modal'),
-    editPlaylistNameInput: document.getElementById('edit-playlist-name-input'),
-    songsInPlaylistList: document.getElementById('songs-in-playlist-list'),
-    editPlaylistAvailableSongsList: document.getElementById('edit-playlist-available-songs-list'),
-    addCurrentSongToPlaylistBtn: document.getElementById('add-current-song-to-playlist-btn'),
-    updatePlaylistBtn: document.getElementById('update-playlist-btn'),
-    cancelEditPlaylistBtn: document.getElementById('cancel-edit-playlist-btn'),
+    elements.playlistNameInput = document.getElementById('playlist-name-input');
+    elements.availableSongsList = document.getElementById('available-songs-list');
+    elements.savePlaylistBtn = document.getElementById('save-playlist-btn');
 
-    // Lyrics editing
-    editLyricsBtn: document.getElementById('edit-lyrics-btn'),
-    lyricsEditorModal: document.getElementById('lyrics-editor-modal'),
-    lyricsEditor: document.getElementById('lyrics-editor'),
-    saveLyricsBtn: document.getElementById('save-lyrics-btn'),
-    cancelLyricsBtn: document.getElementById('cancel-lyrics-btn'),
+    elements.editPlaylistModal = document.getElementById('edit-playlist-modal');
+    elements.editPlaylistNameInput = document.getElementById('edit-playlist-name-input');
+    elements.songsInPlaylistList = document.getElementById('songs-in-playlist-list');
+    elements.editPlaylistAvailableSongsList = document.getElementById('edit-playlist-available-songs-list');
+    elements.addCurrentSongToPlaylistBtn = document.getElementById('add-current-song-to-playlist-btn');
+    elements.updatePlaylistBtn = document.getElementById('update-playlist-btn');
+    elements.cancelEditPlaylistBtn = document.getElementById('cancel-edit-playlist-btn');
 
-    // Root element for theme variables
-    root: document.documentElement,
+    elements.editLyricsBtn = document.getElementById('edit-lyrics-btn');
+    elements.lyricsEditorModal = document.getElementById('lyrics-editor-modal');
+    elements.lyricsEditor = document.getElementById('lyrics-editor');
+    elements.saveLyricsBtn = document.getElementById('save-lyrics-btn');
+    elements.cancelLyricsBtn = document.getElementById('cancel-lyrics-btn');
 
-    // Main layout elements referenced by presentation mode
-    mainContentArea: document.getElementById('main-content-area'),
-    playerSectionArea: document.getElementById('player-section-area'),
+    elements.root = document.documentElement;
 
-    // Playlist I/O Buttons and Modal
-    exportPlaylistsBtn: document.getElementById('export-playlists-btn'),
-    importPlaylistsBtn: document.getElementById('import-playlists-btn'),
-    playlistIoModal: document.getElementById('playlist-io-modal'),
-    playlistExportJson: document.getElementById('playlist-export-json'),
-    copyPlaylistJsonBtn: document.getElementById('copy-playlist-json-btn'),
-    downloadPlaylistJsonBtn: document.getElementById('download-playlist-json-btn'),
-    playlistImportJson: document.getElementById('playlist-import-json'),
-    uploadPlaylistJson: document.getElementById('upload-playlist-json'),
-    playlistFileInfo: document.getElementById('playlist-file-info'),
-    importPlaylistDataBtn: document.getElementById('import-playlist-data-btn'),
-    playlistIoModalTabButtons: document.querySelectorAll('#playlist-io-modal .tab-btn'),
-    playlistExportTab: document.getElementById('playlist-export-tab'),
-    playlistImportTab: document.getElementById('playlist-import-tab'),
+    elements.mainContentArea = document.getElementById('main-content-area');
+    elements.playerSectionArea = document.getElementById('player-section-area');
 
-    // Folder Playlist Import
-    importPlaylistFromFolderBtn: document.getElementById('import-playlist-from-folder-btn'),
-    importFolderInput: document.getElementById('import-folder-input'),
+    elements.exportPlaylistsBtn = document.getElementById('export-playlists-btn');
+    elements.importPlaylistsBtn = document.getElementById('import-playlists-btn');
+    elements.playlistIoModal = document.getElementById('playlist-io-modal');
+    elements.playlistExportJson = document.getElementById('playlist-export-json');
+    elements.copyPlaylistJsonBtn = document.getElementById('copy-playlist-json-btn');
+    elements.downloadPlaylistJsonBtn = document.getElementById('download-playlist-json-btn');
+    elements.playlistImportJson = document.getElementById('playlist-import-json');
+    elements.uploadPlaylistJson = document.getElementById('upload-playlist-json');
+    elements.playlistFileInfo = document.getElementById('playlist-file-info');
+    elements.importPlaylistDataBtn = document.getElementById('import-playlist-data-btn');
+    elements.playlistIoModalTabButtons = document.querySelectorAll('#playlist-io-modal .tab-btn');
+    elements.playlistExportTab = document.getElementById('playlist-export-tab');
+    elements.playlistImportTab = document.getElementById('playlist-import-tab');
 
-    // Locate Audio Modal
-    locateAudioModal: document.getElementById('locate-audio-modal'),
-    missingFilenameDisplay: document.getElementById('missing-filename-display'),
-    missingSongTitleDisplay: document.getElementById('missing-song-title-display'),
-    audioSourceFolderInputBtn: document.querySelector('label[for="audio-source-folder-input-btn"]'), 
-    audioSourceFolderInput: document.getElementById('audio-source-folder-input'),
-    audioLocatorStatus: document.getElementById('audio-locator-status'),
-    skipLocatingAudioBtn: document.getElementById('skip-locating-audio-btn'),
-};
+    elements.importPlaylistFromFolderBtn = document.getElementById('import-playlist-from-folder-btn');
+    elements.importFolderInput = document.getElementById('import-folder-input');
+
+    elements.locateAudioModal = document.getElementById('locate-audio-modal');
+    elements.missingFilenameDisplay = document.getElementById('missing-filename-display');
+    elements.missingSongTitleDisplay = document.getElementById('missing-song-title-display');
+    elements.audioSourceFolderInputBtn = document.querySelector('label[for="audio-source-folder-input-btn"]'); 
+    elements.audioSourceFolderInput = document.getElementById('audio-source-folder-input');
+    elements.audioLocatorStatus = document.getElementById('audio-locator-status');
+    elements.skipLocatingAudioBtn = document.getElementById('skip-locating-audio-btn');
+}
