@@ -11,6 +11,7 @@ import * as AudioLocator from './audioLocator.js'; // Import AudioLocator for se
 let currentLoadedMetadataListener = null;
 let currentTimeUpdateListener = null;
 let currentEndedListener = null;
+let currentErrorListener = null; // Listener for persistent audio errors
 
 export function cleanupOldAudio() {
     if (state.audio) {
@@ -28,6 +29,10 @@ export function cleanupOldAudio() {
         if (currentEndedListener) {
             state.audio.removeEventListener('ended', currentEndedListener);
             currentEndedListener = null;
+        }
+        if (currentErrorListener) {
+            state.audio.removeEventListener('error', currentErrorListener);
+            currentErrorListener = null;
         }
         
         // Revoke ObjectURL if it's a blob
@@ -101,7 +106,14 @@ export function setupAudioListeners() {
     };
 
     currentTimeUpdateListener = () => {
-        if (!state.audio) return; // Safety guard
+        // Guard against null audio or audio in an error state
+        if (!state.audio || state.audio.error) { 
+            if (state.audio && state.audio.error) {
+                // This log can be noisy if errors are frequent, consider removing or making conditional
+                // console.warn("Audio element in error state during timeupdate:", state.audio.error.code, state.audio.error.message);
+            }
+            return; 
+        }
         state.currentTime = state.audio.currentTime;
         updateTimeDisplay();
         UI.updateProgressUI();
@@ -122,10 +134,24 @@ export function setupAudioListeners() {
         }
     };
 
+    currentErrorListener = (e) => {
+        console.error("Error on persistent audio object:", e, state.audio?.error);
+        // Perform cleanup similar to what would happen if audio failed to load initially
+        if (state.audio && state.audio.src && state.audio.src.startsWith('blob:')) {
+            URL.revokeObjectURL(state.audio.src);
+        }
+        state.audio = null;
+        state.isPlaying = false;
+        state.currentSong.audioUrl = null; // Clear the URL, as it's problematic
+        // audioFilename remains, so AudioLocator can try again if user re-selects song.
+        UI.updateUI(); // This will update player controls, reflect no audio, etc.
+    };
+
     // Add the new listeners
     state.audio.addEventListener('loadedmetadata', currentLoadedMetadataListener);
     state.audio.addEventListener('timeupdate', currentTimeUpdateListener);
     state.audio.addEventListener('ended', currentEndedListener);
+    state.audio.addEventListener('error', currentErrorListener);
 
     if (elements.volumeSlider) { // ensure elements are loaded
         state.audio.volume = parseFloat(elements.volumeSlider.value);
@@ -245,92 +271,4 @@ export async function processAudioFileAndUpdateState(file) {
         state.audio.addEventListener('loadedmetadata', tempOnLoadedMetadata);
         state.audio.addEventListener('error', tempOnError);
     });
-}
-
-// Playlist management functions
-import { state, resetCurrentSong, getCurrentPlaylist, getHistory } from './state.js';
-import { elements } from './dom.js';
-import * as UI from './ui/index.js';
-import * as Storage from './storage.js';
-import * as Modal from '../modal.js';
-import * as AudioLocator from './audioLocator.js';
-import * as Audio from '../audio.js'; // Import Audio module for cleanup
-
-// Module-level variable to store song IDs for the playlist being edited in the modal
-let tempEditingSongs = [];
-
-// ...
-
-export function loadSongFromHistory(index) {
-    if (index < 0 || index >= state.history.length) return;
-    
-    const historySong = state.history[index];
-    
-    const previouslyLoadedSongId = state.currentSong.id;
-    const previouslyLoadedAudioUrl = state.currentSong.audioUrl;
-    const previouslyLoadedImage = state.currentSong.image;
-
-    // Revoke old blob URLs if we are switching to a *different* song.
-    if (previouslyLoadedSongId && previouslyLoadedSongId !== historySong.id) {
-        // Audio blob URL is handled by Audio.cleanupOldAudio()
-        if (previouslyLoadedImage && previouslyLoadedImage.startsWith('blob:')) {
-            URL.revokeObjectURL(previouslyLoadedImage);
-        }
-    }
-    
-    // Update current song with history data
-    state.currentSong = {
-        // ...
-        audioUrl: historySong.audioUrl || null, // Prefer audioUrl from history if available
-        image: previouslyLoadedImage ? previouslyLoadedImage : (historySong.image || null),
-        audioFilename: historySong.audioFilename || null,
-        extractedPalette: previouslyLoadedSongId === historySong.id ? state.currentSong.extractedPalette : [],
-    };
-
-    // Manage audio state
-    if (previouslyLoadedSongId !== historySong.id || !state.audio) { 
-        Audio.cleanupOldAudio(); // Clean up any existing audio thoroughly
-
-        if (state.currentSong.audioUrl) { // If the newly loaded song data has an audioUrl
-            try {
-                state.audio = new Audio(state.currentSong.audioUrl);
-                Audio.setupAudioListeners(); // This will set up for the new state.audio
-            } catch (e) {
-                console.error(`Error creating audio from URL ${state.currentSong.audioUrl}:`, e);
-                if (state.currentSong.audioUrl.startsWith('blob:')) URL.revokeObjectURL(state.currentSong.audioUrl);
-                state.currentSong.audioUrl = null; 
-            }
-        }
-    } else { // Same song re-selected. Reset its playback.
-        if(state.audio) {
-            state.audio.pause();
-            state.audio.currentTime = 0; // Rewind it.
-            state.isPlaying = false;
-        } else {
-            // This case (same song ID but state.audio is null) implies something went wrong.
-            // Attempt cleanup and let AudioLocator try to find it.
-            Audio.cleanupOldAudio();
-        }
-    }
-
-    state.currentLineIndex = -1;
-    
-    // Audio location logic (runs if state.audio is null and audioFilename exists)
-    if (!state.audio && state.currentSong.audioFilename) {
-        AudioLocator.findAndLoadAudio(state.currentSong)
-            .then(audioLoaded => {
-                if (!audioLoaded) {
-                    UI.updateUI();
-                }
-                Storage.saveCurrentSongState();
-            })
-            .catch(error => {
-                console.error("Error in audio location process:", error);
-                UI.updateUI(); // Update UI to reflect error or no audio state
-                Storage.saveCurrentSongState();
-            });
-    } else {
-        UI.updateUI(); // Update UI even if audio is already available or no locator needed
-        Storage.saveCurrentSongState();
-    }
 }
