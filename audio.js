@@ -5,7 +5,6 @@ import * as UI from './ui/index.js';
 import * as Playlist from './playlist.js';
 import * as Lyrics from './lyrics.js';
 import * as Storage from './storage.js';
-import * as Presentation from './presentation/index.js';
 
 export function setupInitialAudio() {
     if (state.currentSong && state.currentSong.audioUrl) {
@@ -71,16 +70,6 @@ export function setupAudioListeners() {
         
         // Store analyzer for visualization
         state.audioAnalyser = analyser;
-        
-        // Start visualizer if in presentation mode
-        if (state.presentation && state.presentation.active) {
-            const visualizerCanvas = document.querySelector('.audio-visualizer');
-            if (visualizerCanvas) {
-                import('./presentation/animations.js').then(module => {
-                    module.startVisualizer(visualizerCanvas, state.audioContext, analyser);
-                });
-            }
-        }
     } catch (e) {
         console.warn('Web Audio API not supported for visualization:', e);
     }
@@ -158,20 +147,21 @@ export function processAudioFileAndUpdateState(file) {
         URL.revokeObjectURL(state.audio.src); 
         state.audio = null;
     }
+    // If an AudioContext source was connected to the previous audio, it's now invalid.
+    // The source needs to be recreated when new audio is loaded.
+    // This is handled in setupAudioListeners by creating a new MediaElementSource.
 
     const audioUrl = URL.createObjectURL(file);
     state.audio = new Audio(audioUrl);
     state.currentSong.audioUrl = audioUrl; 
     state.currentSong.audioFilename = file.name; 
-    state.isPlaying = false;
+    state.isPlaying = false; // New audio isn't playing yet
     state.currentTime = 0;
     elements.playBtn.innerHTML = '<i class="fas fa-play"></i>';
 
-    setupAudioListeners(); 
+    setupAudioListeners(); // This sets up core listeners and analyser for the NEW state.audio
 
     const filename = file.name.replace(/\.[^/.]+$/, ""); 
-    // Only set title/artist if they are currently empty, to avoid overwriting manually set ones
-    // or ones set by folder import logic which might be more accurate.
     if (!state.currentSong.title && !state.currentSong.artist) {
         const parts = filename.split(' - ');
         if (parts.length > 1) {
@@ -185,6 +175,10 @@ export function processAudioFileAndUpdateState(file) {
 
     Storage.saveCurrentSongState(); 
     UI.updateUI(); 
+
+    // Dispatch an event to notify other modules (like presentation mode) that audio is ready
+    const audioReadyEvent = new CustomEvent('audioready', { detail: { audio: state.audio } });
+    document.body.dispatchEvent(audioReadyEvent);
 }
 
 /**

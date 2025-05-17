@@ -12,6 +12,14 @@ const presentationElements = {
 };
 
 /**
+ * Get the main presentation header DOM element.
+ * @returns {HTMLElement | null}
+ */
+export function getPresentationHeaderElement() {
+  return presentationElements.headerContainer;
+}
+
+/**
  * Create the mode toggle button
  */
 export function createModeToggle() {
@@ -235,9 +243,12 @@ export function cleanupPresentationUI() {
       elements.playerSectionArea.classList.remove('presentation-player');
   }
   
-  // Remove header if present
-  if (presentationElements.headerContainer && presentationElements.headerContainer.parentElement) {
-    presentationElements.headerContainer.parentElement.removeChild(presentationElements.headerContainer);
+  // Remove header if present and ensure it's not collapsed
+  if (presentationElements.headerContainer) {
+    if (presentationElements.headerContainer.parentElement) {
+        presentationElements.headerContainer.parentElement.removeChild(presentationElements.headerContainer);
+    }
+    presentationElements.headerContainer.classList.remove('header-collapsed');
   }
   
   // Remove webcam space if present
@@ -283,13 +294,14 @@ export function hideWebcamSpace() {
 }
 
 /**
- * Update the visibility of the header based on settings
+ * Update the visibility of the header based on settings.
+ * The collapsed/expanded state is managed by audio events, not directly here.
  */
 export function updateHeaderVisibility() {
   if (!presentationElements.headerContainer) return;
   
   if (state.presentation.showHeader) {
-    presentationElements.headerContainer.style.display = 'block';
+    presentationElements.headerContainer.style.display = 'block'; // Or 'flex' or its default
   } else {
     presentationElements.headerContainer.style.display = 'none';
   }
@@ -319,4 +331,22 @@ export function toggleSettingsPanel() {
   if (!presentationElements.settingsPanel) return;
   
   presentationElements.settingsPanel.classList.toggle('visible');
+}
+
+/**
+ * Adds the 'header-collapsed' class to the presentation header.
+ */
+export function collapseHeader() {
+  if (presentationElements.headerContainer) {
+    presentationElements.headerContainer.classList.add('header-collapsed');
+  }
+}
+
+/**
+ * Removes the 'header-collapsed' class from the presentation header.
+ */
+export function expandHeader() {
+  if (presentationElements.headerContainer) {
+    presentationElements.headerContainer.classList.remove('header-collapsed');
+  }
 }

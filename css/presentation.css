@@ -22,13 +22,19 @@ body.presentation-mode .main-content {
 /* Header Image Container */
 .presentation-header {
   width: 100%;
-  height: 0;
+  height: 0; /* Key for padding-bottom aspect ratio trick */
   padding-bottom: 42%; /* Aspect ratio for 1356x768 is roughly 16:9 */
   position: relative;
   overflow: hidden;
   background-color: rgba(0, 0, 0, 0.3);
   margin-bottom: 0;
-  transition: height 0.3s ease;
+  /* Ensure both height and padding-bottom are transitioned */
+  transition: height 0.5s ease-in-out, padding-bottom 0.5s ease-in-out;
+}
+
+.presentation-header.header-collapsed {
+  padding-bottom: 0 !important; /* Remove padding-bottom that defines aspect ratio height */
+  height: 70px; /* Desired smaller height */
 }
 
 .presentation-header img {
@@ -38,6 +44,13 @@ body.presentation-mode .main-content {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.presentation-header.header-collapsed img {
+  /* Optional: Image can remain fully visible or be adjusted */
+  /* opacity: 0.5; */
+  object-position: center top; /* Adjust image focus if needed */
 }
 
 .presentation-header .song-info-overlay {
@@ -49,6 +62,16 @@ body.presentation-mode .main-content {
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
   color: white;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  /* Add padding and transform to transition for smooth hide/show */
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, padding 0.5s ease-in-out;
+  opacity: 1;
+}
+
+.presentation-header.header-collapsed .song-info-overlay {
+  opacity: 0;
+  transform: translateY(100%); /* Slide out of view */
+  pointer-events: none; /* Prevent interaction when hidden */
+  padding: 0.2rem 1rem; /* Reduce padding for the transition out */
 }
 
 .presentation-header .song-info-overlay h1 {
