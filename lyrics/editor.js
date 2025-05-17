@@ -4,6 +4,7 @@ import { elements } from '../dom.js';
 import * as Modal from '../modal.js';
 import * as Storage from '../storage.js';
 import { renderLyrics } from './render.js';
+import { parseLyricsContent } from './core.js'; // Import the refactored parser
 
 /**
  * Opens the modal editor for editing lyrics.
@@ -28,10 +29,8 @@ export function saveLyricsFromEditor() {
     const oldLyrics = [...state.currentSong.lyrics];
     const oldTiming = [...state.currentSong.timing];
 
-    // Parse the new lyrics from the editor
-    const newParsedLines = lyricsContent.split('\n')
-        .map(line => line.trim())
-        .filter(line => line.length > 0);
+    // Parse the new lyrics from the editor using the refactored function
+    const newParsedLines = parseLyricsContent(lyricsContent);
 
     if (newParsedLines.length === oldLyrics.length) {
         // Line count is the same, update lyrics but preserve timing

@@ -1,5 +1,5 @@
 // lyrics/upload.js - Handlers for uploading lyrics files
-import { parseLyrics } from './core.js';
+import { parseLyricsContent, applyLyricsToCurrentSong } from './core.js';
 import { renderLyrics } from './render.js';
 import * as Storage from '../storage.js';
 import { state } from '../state.js';
@@ -16,7 +16,8 @@ export function handleLyricsUpload(e) {
     const reader = new FileReader();
     reader.onload = function(event) {
         const content = event.target.result;
-        parseLyrics(content);
+        const lines = parseLyricsContent(content);
+        applyLyricsToCurrentSong(lines);
         renderLyrics();
         Storage.saveCurrentSongState();
 

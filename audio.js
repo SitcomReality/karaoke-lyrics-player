@@ -143,7 +143,16 @@ export function updateTimeDisplay() {
 export function handleAudioUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
+    processAudioFileAndUpdateState(file);
+    e.target.value = ''; // Clear the input field
+}
 
+/**
+ * Processes an audio file, updates the state, and UI.
+ * Can be called from file input or programmatically.
+ * @param {File} file The audio file to process.
+ */
+export function processAudioFileAndUpdateState(file) {
     if (state.audio) {
         state.audio.pause();
         URL.revokeObjectURL(state.audio.src); 
@@ -161,6 +170,8 @@ export function handleAudioUpload(e) {
     setupAudioListeners(); 
 
     const filename = file.name.replace(/\.[^/.]+$/, ""); 
+    // Only set title/artist if they are currently empty, to avoid overwriting manually set ones
+    // or ones set by folder import logic which might be more accurate.
     if (!state.currentSong.title && !state.currentSong.artist) {
         const parts = filename.split(' - ');
         if (parts.length > 1) {
@@ -174,4 +185,36 @@ export function handleAudioUpload(e) {
 
     Storage.saveCurrentSongState(); 
     UI.updateUI(); 
+}
+
+/**
+ * Loads an audio file and returns a promise with its ObjectURL, duration, and filename.
+ * Does not modify global state directly.
+ * @param {File} file The audio file to load.
+ * @returns {Promise<{audioUrl: string, duration: number, audioFilename: string}>}
+ */
+export function loadAudioFileAsPromise(file) {
+    return new Promise((resolve, reject) => {
+        if (!file || !file.type.startsWith('audio/')) {
+            reject(new Error("Invalid audio file provided."));
+            return;
+        }
+
+        const audioUrl = URL.createObjectURL(file);
+        const tempAudio = new Audio(audioUrl);
+
+        tempAudio.onloadedmetadata = () => {
+            resolve({
+                audioUrl: audioUrl,
+                duration: tempAudio.duration,
+                audioFilename: file.name
+            });
+        };
+
+        tempAudio.onerror = (e) => {
+            URL.revokeObjectURL(audioUrl); // Clean up ObjectURL on error
+            console.error("Error loading audio file:", e);
+            reject(new Error(`Failed to load audio file: ${file.name}`));
+        };
+    });
 }

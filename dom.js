@@ -127,4 +127,8 @@ export const elements = {
     playlistIoModalTabButtons: document.querySelectorAll('#playlist-io-modal .tab-btn'),
     playlistExportTab: document.getElementById('playlist-export-tab'),
     playlistImportTab: document.getElementById('playlist-import-tab'),
+
+    // Folder Playlist Import
+    importPlaylistFromFolderBtn: document.getElementById('import-playlist-from-folder-btn'),
+    importFolderInput: document.getElementById('import-folder-input'),
 };

@@ -11,6 +11,7 @@ import * as Modal from './modal.js';
 import { extractColorsFromImage } from './colorExtractor.js'; 
 import * as Playlist from './playlist.js'; 
 import * as PlaylistIO from './playlistIO.js'; // Specific Playlist I/O
+import * as FolderPlaylistImport from './folderPlaylistImport.js'; // Import new module
 
 export function setupEventListeners() {
     // Audio player controls
@@ -60,6 +61,11 @@ export function setupEventListeners() {
     elements.exportPlaylistsBtn.addEventListener('click', PlaylistIO.openExportPlaylistsModal);
     elements.importPlaylistsBtn.addEventListener('click', PlaylistIO.openImportPlaylistsModal);
     PlaylistIO.setupPlaylistIOModal(); // Setup listeners for the playlist I/O modal
+
+    // Folder Playlist Import
+    elements.importPlaylistFromFolderBtn.addEventListener('click', FolderPlaylistImport.triggerFolderImport);
+    elements.importFolderInput.addEventListener('change', FolderPlaylistImport.handleFolderFilesSelected);
+
 
     // Theme/Color editing modal handlers
     elements.applyColorsBtn.addEventListener('click', handleApplyColors);
