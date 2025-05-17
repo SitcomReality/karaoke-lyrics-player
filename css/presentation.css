@@ -102,8 +102,8 @@ body.presentation-mode .lyrics-container {
   padding: 2rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  justify-content: center; /* Vertically center the block of lyrics */
+  align-items: flex-start; /* Horizontally align lines to the start (left) */
   overflow: hidden;
   position: relative;
 }
@@ -111,11 +111,11 @@ body.presentation-mode .lyrics-container {
 body.presentation-mode .lyrics-line {
   font-size: 2.5rem;
   line-height: 1.3;
-  text-align: center;
+  text-align: left; /* Align text within each line to the left */
   padding: 0.5rem 1rem;
   margin: 0.5rem 0;
   border-radius: 8px;
-  max-width: 90%;
+  max-width: 90%; /* Lines will take up to 90% of container width */
   transition: all 0.3s ease;
   opacity: 0.5;
 }
@@ -209,6 +209,21 @@ body.presentation-mode .animation-slide .lyrics-line.active {
 body.presentation-mode .animation-slide .lyrics-line.past {
   transform: translateX(-50px);
   opacity: 0;
+}
+
+@keyframes pulsePlaceholderIcon {
+    0% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+    100% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
 }
 
 /* Mode Toggle Button */
