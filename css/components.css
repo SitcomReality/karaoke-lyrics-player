@@ -9,11 +9,20 @@
 }
 
 .sidebar .panel {
-    max-height: 25vh;
+    max-height: 25vh; 
+}
+
+.left-sidebar .sidebar-section:nth-child(2) .panel { 
+    max-height: calc(25vh - 60px); 
 }
 
 #current-playlist-panel .panel {
     max-height: 40vh;
+}
+
+#current-playlist-panel .playlist-songs { 
+    max-height: none; 
+    overflow-y: visible; 
 }
 
 .empty-message {
@@ -105,12 +114,12 @@
     font-size: var(--font-size-small);
     color: rgba(var(--rgb-on-surface), 0.6); 
     font-style: italic;
-    width: 100%; 
+    display: inline-block; 
+    vertical-align: middle;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     text-align: left; 
-    margin-bottom: var(--spacing-xs); 
 }
 
 .control-btn {
@@ -298,6 +307,19 @@
 
 #toggle-auto-advance-btn:not(.active) .fa-forward {
     opacity: 0.5; 
+}
+
+/* Playlist Management Buttons Container */
+.playlist-management-buttons {
+    margin-top: var(--spacing-sm);
+    display: flex;
+    flex-direction: column; 
+    gap: var(--spacing-xs);
+}
+
+.playlist-management-buttons .btn {
+    width: 100%; 
+    justify-content: flex-start; 
 }
 
 /* Theme settings preview */
@@ -499,6 +521,7 @@
 }
 
 #playlist-name-input,
+#edit-playlist-name-input,
 #custom-font-input {
     width: 100%;
     background-color: rgba(var(--rgb-on-surface), 0.05);
@@ -510,6 +533,7 @@
 }
 
 #playlist-name-input::placeholder,
+#edit-playlist-name-input::placeholder,
 #custom-font-input::placeholder {
     color: rgba(var(--rgb-on-surface), 0.5);
 }
@@ -567,20 +591,21 @@
 }
 
 .panel-item.active {
-    background-color: rgba(52, 168, 83, 0.2); 
-    border-left: 3px solid var(--accent-color);
+    background-color: rgba(var(--rgb-primary), 0.1); 
+    border-left: 3px solid var(--primary-color); 
+    color: var(--on-surface); 
 }
 
 .panel-item.missing-song {
     opacity: 0.6;
     cursor: default;
-    background-color: rgba(207, 102, 121, 0.1); 
+    background-color: rgba(var(--rgb-error), 0.1); 
     border-left-color: var(--error-color);
     color: var(--on-surface); 
 }
 
 .panel-item.missing-song:hover {
-    background-color: rgba(207, 102, 121, 0.15);
+    background-color: rgba(var(--rgb-error), 0.15);
 }
 
 .item-info {
@@ -627,7 +652,7 @@
 }
 
 .status-incomplete {
-    background-color: rgba(255, 193, 7, 0.2);
+    background-color: rgba(255, 193, 7, 0.2); 
     color: #ffc107; 
 }
 
@@ -644,7 +669,7 @@
 }
 
 .playlist-editor-section h3 {
-    font-size: var(--font-size-normal); /* Smaller heading for sections within modal */
+    font-size: var(--font-size-normal); 
     color: var(--on-surface);
     border-bottom: 1px solid rgba(var(--rgb-on-surface), 0.1);
     padding-bottom: var(--spacing-xs);
@@ -652,7 +677,7 @@
 }
 
 .editable-song-list {
-    max-height: 150px; /* Or suitable height */
+    max-height: 150px; 
     overflow-y: auto;
     background-color: rgba(var(--rgb-on-surface), 0.03);
     border-radius: 4px;
@@ -679,15 +704,15 @@
 }
 
 .editable-song-item .action-btn.remove-song-from-playlist i {
-    color: var(--error-color); /* Make remove icon red */
+    color: var(--error-color); 
 }
 .editable-song-item .action-btn.remove-song-from-playlist:hover i {
-    color: var(--on-surface);
+    color: var(--on-surface); 
 }
 
 #add-current-song-to-playlist-btn {
-    display: block;
-    margin: var(--spacing-md) auto; /* Center button */
+    display: block; 
+    margin: var(--spacing-md) auto; 
 }
 
 .modal-actions {

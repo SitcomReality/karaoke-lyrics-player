@@ -31,6 +31,10 @@
                     <p class="empty-message">No playlists yet</p>
                 </div>
                 <button id="create-playlist" class="btn"><i class="fas fa-plus"></i> New Playlist</button>
+                <div class="playlist-management-buttons">
+                    <button id="export-playlists-btn" class="btn small-btn"><i class="fas fa-file-export"></i> Export Playlists</button>
+                    <button id="import-playlists-btn" class="btn small-btn"><i class="fas fa-file-import"></i> Import Playlists</button>
+               </div>
             </div>
         </div>
 
@@ -283,6 +287,37 @@
             <div class="modal-actions">
                 <button id="save-lyrics-btn" class="btn primary-btn">Save Lyrics</button>
                 <button id="cancel-lyrics-btn" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="playlist-io-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Manage Playlists Data</h2>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="playlist-export">Export</button>
+                <button class="tab-btn" data-tab="playlist-import">Import</button>
+            </div>
+            <div class="tab-content" id="playlist-export-tab">
+                <p>Copy the playlists data JSON or download it as a file:</p>
+                <textarea id="playlist-export-json" rows="10" readonly></textarea>
+                <div class="modal-actions" style="justify-content: space-between; margin-top: var(--spacing-sm);">
+                    <button id="copy-playlist-json-btn" class="btn primary-btn"><i class="fas fa-copy"></i> Copy to Clipboard</button>
+                    <button id="download-playlist-json-btn" class="btn"><i class="fas fa-download"></i> Download .json</button>
+                </div>
+            </div>
+            <div class="tab-content" id="playlist-import-tab" style="display: none;">
+                <p>Paste the playlist data JSON below or upload a .json file:</p>
+                <textarea id="playlist-import-json" rows="10" placeholder="Paste playlist JSON here..."></textarea>
+                <div style="margin: var(--spacing-sm) 0;">
+                    <label for="upload-playlist-json" class="btn">
+                        <i class="fas fa-upload"></i> Upload Playlists File (.json)
+                    </label>
+                    <input type="file" id="upload-playlist-json" accept=".json" class="file-input">
+                    <span id="playlist-file-info" class="file-info-display" style="margin-left: var(--spacing-sm);">No file selected</span>
+                </div>
+                <button id="import-playlist-data-btn" class="btn primary-btn" style="margin-top: var(--spacing-sm);">Import Playlists</button>
             </div>
         </div>
     </div>

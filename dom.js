@@ -65,7 +65,7 @@ export const elements = {
     exportJson: document.getElementById('export-json'),
     copyJsonBtn: document.getElementById('copy-json-btn'),
     importBtn: document.getElementById('import-btn'),
-    tabButtons: document.querySelectorAll('.tab-btn'),
+    tabButtons: document.querySelectorAll('.tab-btn'), 
     importTab: document.getElementById('import-tab'),
     exportTab: document.getElementById('export-tab'),
     modalCloseButtons: document.querySelectorAll('.modal .close'),
@@ -112,4 +112,19 @@ export const elements = {
     // Main layout elements referenced by presentation mode
     mainContentArea: document.getElementById('main-content-area'),
     playerSectionArea: document.getElementById('player-section-area'),
+
+    // Playlist I/O Buttons and Modal
+    exportPlaylistsBtn: document.getElementById('export-playlists-btn'),
+    importPlaylistsBtn: document.getElementById('import-playlists-btn'),
+    playlistIoModal: document.getElementById('playlist-io-modal'),
+    playlistExportJson: document.getElementById('playlist-export-json'),
+    copyPlaylistJsonBtn: document.getElementById('copy-playlist-json-btn'),
+    downloadPlaylistJsonBtn: document.getElementById('download-playlist-json-btn'),
+    playlistImportJson: document.getElementById('playlist-import-json'),
+    uploadPlaylistJson: document.getElementById('upload-playlist-json'),
+    playlistFileInfo: document.getElementById('playlist-file-info'),
+    importPlaylistDataBtn: document.getElementById('import-playlist-data-btn'),
+    playlistIoModalTabButtons: document.querySelectorAll('#playlist-io-modal .tab-btn'),
+    playlistExportTab: document.getElementById('playlist-export-tab'),
+    playlistImportTab: document.getElementById('playlist-import-tab'),
 };
