@@ -17,6 +17,7 @@ export function initializeElements() {
     elements.lyricsPlaceholder = document.querySelector('.lyrics-placeholder');
 
     elements.uploadAudio = document.getElementById('upload-audio');
+    elements.loadAudioUrlBtn = document.getElementById('load-audio-url-btn'); 
     elements.uploadImage = document.getElementById('upload-image');
     elements.uploadLyrics = document.getElementById('upload-lyrics');
     elements.lyricsUploadLabel = document.querySelector('label[for="upload-lyrics"]');
@@ -51,6 +52,11 @@ export function initializeElements() {
     elements.colorEditModal = document.getElementById('color-edit-modal');
     elements.customFontModal = document.getElementById('custom-font-modal');
     elements.createPlaylistModal = document.getElementById('create-playlist-modal');
+    elements.loadAudioUrlModal = document.getElementById('load-audio-url-modal'); 
+    elements.audioUrlInput = document.getElementById('audio-url-input'); 
+    elements.loadFromUrlConfirmBtn = document.getElementById('load-from-url-confirm-btn'); 
+    elements.audioUrlModalStatus = document.getElementById('audio-url-modal-status'); 
+
 
     elements.importJson = document.getElementById('import-json');
     elements.exportJson = document.getElementById('export-json');

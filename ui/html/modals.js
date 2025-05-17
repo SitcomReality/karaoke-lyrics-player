@@ -140,7 +140,7 @@ export function createModalsHTML() {
                     <button id="download-playlist-json-btn" class="btn"><i class="fas fa-download"></i> Download .json</button>
                 </div>
             </div>
-            <div class="tab-content" id="!playlist-import-tab" style="display: none;">
+            <div class="tab-content" id="playlist-import-tab" style="display: none;">
                 <p>Paste the playlist data JSON below or upload a .json file:</p>
                 <textarea id="playlist-import-json" rows="10" placeholder="Paste playlist JSON here..."></textarea>
                 <div style="margin: var(--spacing-sm) 0;">
@@ -173,6 +173,19 @@ export function createModalsHTML() {
             
             <div class="modal-actions" style="margin-top: var(--spacing-md);">
                 <button id="skip-locating-audio-btn" class="btn">Skip Audio for this Song</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="load-audio-url-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Load Audio from URL</h2>
+            <p>Enter the direct URL to an MP3 audio file:</p>
+            <input type="url" id="audio-url-input" placeholder="https://example.com/audio.mp3" style="width: 100%; padding: var(--spacing-sm); margin: var(--spacing-sm) 0;">
+            <p class="note" id="audio-url-modal-status" style="min-height: 1.2em;"></p>
+            <div class="modal-actions">
+                <button id="load-from-url-confirm-btn" class="btn primary-btn">Load Audio</button>
             </div>
         </div>
     </div>

@@ -22,6 +22,7 @@ export function setupEventListeners() {
 
     // Upload handlers
     elements.uploadAudio.addEventListener('change', Audio.handleAudioUpload);
+    elements.loadAudioUrlBtn.addEventListener('click', handleLoadAudioUrlModalOpen); 
     elements.uploadImage.addEventListener('change', handleImageUpload);
     elements.uploadLyrics.addEventListener('change', Lyrics.handleLyricsUpload);
 
@@ -94,6 +95,9 @@ export function setupEventListeners() {
         state.editingPlaylistId = null; // Clear editing state
     });
 
+    // Load Audio from URL modal controls
+    elements.loadFromUrlConfirmBtn.addEventListener('click', handleLoadAudioFromUrl); 
+
     // Keyboard shortcut for marking next line
     document.addEventListener('keydown', (e) => {
         const activeElement = document.activeElement;
@@ -123,6 +127,41 @@ export function setupEventListeners() {
         locateAudioModalCloseBtn.addEventListener('click', AudioLocator.handleLocateAudioModalClosed);
     }
     // If modal.js uses a generic approach, this might need adjustment in modal.js or AudioLocator.
+}
+
+function handleLoadAudioUrlModalOpen() {
+    elements.audioUrlInput.value = '';
+    elements.audioUrlModalStatus.textContent = '';
+    Modal.openModal(elements.loadAudioUrlModal);
+}
+
+async function handleLoadAudioFromUrl() {
+    const url = elements.audioUrlInput.value.trim();
+    if (!url) {
+        elements.audioUrlModalStatus.textContent = 'Please enter a valid URL.';
+        return;
+    }
+    if (!url.toLowerCase().endsWith('.mp3') && !url.toLowerCase().endsWith('.wav') && !url.toLowerCase().endsWith('.ogg') && !url.toLowerCase().endsWith('.m4a') && !url.toLowerCase().endsWith('.aac') && !url.toLowerCase().endsWith('.flac')) {
+        // Basic check, server might use different content-type, but good for common cases.
+        elements.audioUrlModalStatus.textContent = 'URL should ideally end with a common audio extension (e.g., .mp3).';
+        // Allow to proceed anyway, as server headers are more definitive.
+    } else {
+         elements.audioUrlModalStatus.textContent = '';
+    }
+
+    elements.loadFromUrlConfirmBtn.disabled = true;
+    elements.loadFromUrlConfirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+
+    try {
+        await Audio.processAudioUrlAndUpdateState(url);
+        Modal.closeModal(elements.loadAudioUrlModal);
+    } catch (error) {
+        elements.audioUrlModalStatus.textContent = `Error: ${error.message}`;
+        console.error("Error loading audio from URL:", error);
+    } finally {
+        elements.loadFromUrlConfirmBtn.disabled = false;
+        elements.loadFromUrlConfirmBtn.innerHTML = 'Load Audio';
+    }
 }
 
 function handleImageUpload(e) {

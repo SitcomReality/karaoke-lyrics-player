@@ -19,6 +19,10 @@ export function createMainContentHTML() {
                         </label>
                         <input type="file" id="upload-audio" accept="audio/*" class="file-input">
 
+                        <button id="load-audio-url-btn" class="upload-btn">
+                            <i class="fas fa-link"></i> Load Audio from URL
+                        </button>
+
                         <label for="upload-image" class="upload-btn">
                             <i class="fas fa-image"></i> Upload Image
                         </label>
