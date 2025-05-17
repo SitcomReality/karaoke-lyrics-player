@@ -47,7 +47,7 @@ export function setupImportExport() {
     });
 }
 
-function generateExportJSON() {
+export function generateExportJSON() {
     if (state.history.length === 0 && state.playlists.length === 0) {
         elements.exportJson.value = JSON.stringify({
             version: CURRENT_EXPORT_VERSION,
@@ -191,7 +191,6 @@ function importProjectData() {
         console.error("Import error:", error);
     }
 }
-
 
 // Helper for importing old single-song format
 function importSingleSongLegacy(jsonData) {
