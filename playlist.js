@@ -3,7 +3,7 @@ import { state, resetCurrentSong, getCurrentPlaylist, getHistory } from './state
 import { elements } from './dom.js';
 import * as UI from './ui/index.js';
 import * as Storage from './storage.js';
-import * as Modal from '../modal.js';
+import * as Modal from './modal.js';
 import * as AudioLocator from './audioLocator.js'; // Import new module
 
 // Module-level variable to store song IDs for the playlist being edited in the modal
